@@ -315,6 +315,256 @@ These are labelled "Beyond the prerequisites" on the lesson page and in lesson l
 - Command-line recipes for biological files (`f1-bio-recipes`) (Beyond)
 - What real analysis workflows look like (`f3-workflows`) (Beyond)
 
+## Companion topics by course item (BioBridge 2.2)
+
+Item titles are from the public Coursera pages (checked 8 November 2026, `tools/course_items.json`). "Background" marks a topic that gives background for an item rather than its exact subject. Items without a topic are introductions, cheat sheets, summaries, quizzes or project submissions.
+
+### Fundamental Skills in Bioinformatics (KAUST (King Abdullah University of Science and Technology))
+
+**Module 1: Introduction to Programming (using R)**
+
+| Course item | Companion topic |
+| --- | --- |
+| Brief introduction to the course | [Programming and R: what and why](../index.html#/c/kaust/kaust-r-intro) |
+| Lecture: Programming and R | [Programming and R: what and why](../index.html#/c/kaust/kaust-r-intro) |
+| Lecture: Introduction to RStudio | [RStudio: a tour of the four panes](../index.html#/c/kaust/kaust-rstudio) |
+| Coding Lecture: First contact with RStudio | [RStudio: a tour of the four panes](../index.html#/c/kaust/kaust-rstudio) |
+| Introduction |  |
+| Lecture: Data types in R | [Data types and vectors in R](../index.html#/c/kaust/kaust-r-vectors) |
+| Lecture: Data structures in R | [Vectors, matrices, lists and data frames](../index.html#/c/kaust/kaust-r-structures) |
+| Coding Lecture: Data types in R - atomic and vectors | [Data types and vectors in R](../index.html#/c/kaust/kaust-r-vectors) |
+| Coding Lecture: Data types in R - lists and matrices | [Vectors, matrices, lists and data frames](../index.html#/c/kaust/kaust-r-structures) |
+| Coding Lecture: Data types in R - data frames | [Vectors, matrices, lists and data frames](../index.html#/c/kaust/kaust-r-structures) |
+| Lecture: Introduction to Control Flow | [if statements in R](../index.html#/c/kaust/kaust-r-if) |
+| Lecture: Loops | [Loops in R](../index.html#/c/kaust/kaust-r-loops) |
+| Coding Lecture: If statements | [if statements in R](../index.html#/c/kaust/kaust-r-if) |
+| Coding Lecture: loop statements | [Loops in R](../index.html#/c/kaust/kaust-r-loops) |
+| Lecture: Loading and Writing | [Loading and writing data files](../index.html#/c/kaust/kaust-r-files) |
+| Coding Lecture: Loading and Writing | [Loading and writing data files](../index.html#/c/kaust/kaust-r-files) |
+| Basics + where to learn more |  |
+| Setting up R | [RStudio: a tour of the four panes](../index.html#/c/kaust/kaust-rstudio) |
+| Available data sets to be used in the course. | [Loading and writing data files](../index.html#/c/kaust/kaust-r-files) |
+| (module description) | [R Markdown: code, results and notes together](../index.html#/c/kaust/kaust-rmarkdown) |
+
+**Module 2: Introduction to Programming II (using R)**
+
+| Course item | Companion topic |
+| --- | --- |
+| Introduction to Module 2 |  |
+| Lecture: Logical values, logical vectors and operations with them. | [Logical values and logical vectors](../index.html#/c/kaust/kaust-logical) |
+| Coding Lecture: Logical Vectors, part 1. | [Logical values and logical vectors](../index.html#/c/kaust/kaust-logical) |
+| Coding Lecture: Logical Vectors, part 2. | [Logical values and logical vectors](../index.html#/c/kaust/kaust-logical) |
+| Lecture: Data Quality Control. | [Data quality control](../index.html#/c/kaust/kaust-qc) |
+| Coding Lecture: Quality Control. | [Data quality control](../index.html#/c/kaust/kaust-qc) |
+| Lecture: Exploratory Data Analysis. | [Exploratory data analysis](../index.html#/c/kaust/kaust-eda) |
+| Coding Lecture: EDA part 1. | [Exploratory data analysis](../index.html#/c/kaust/kaust-eda) |
+| Coding Lecture: EDA part 2. | [Exploratory data analysis](../index.html#/c/kaust/kaust-eda) |
+| Lecture: Correlation | [Correlation](../index.html#/c/kaust/kaust-correlation) |
+| Coding Lecture: correlation in R | [Correlation](../index.html#/c/kaust/kaust-correlation) |
+| Lecture: Linear Models | [Linear models](../index.html#/c/kaust/kaust-lm) |
+| Coding Lecture: example of a linear model | [Linear models](../index.html#/c/kaust/kaust-lm) |
+| Coding Lecture: evaluation of a linear model in R | [Linear models](../index.html#/c/kaust/kaust-lm) |
+| Lecture: t-test & ANOVA | [The t-test: comparing two groups](../index.html#/c/kaust/kaust-ttest); [ANOVA: comparing three or more groups](../index.html#/c/kaust/kaust-anova); [What a p-value means (and does not mean)](../index.html#/c/kaust/kaust-pvalue) |
+| Coding Lecture: t-test. | [The t-test: comparing two groups](../index.html#/c/kaust/kaust-ttest) |
+| Coding Lecture: ANOVA | [ANOVA: comparing three or more groups](../index.html#/c/kaust/kaust-anova) |
+| Introduction to the dataset: Data set 4. | [A first analysis, start to finish](../index.html#/c/kaust/kaust-guided) |
+| Guided analysis. | [A first analysis, start to finish](../index.html#/c/kaust/kaust-guided) |
+| Lecture: R packages | [R packages: install once, load every session](../index.html#/c/kaust/kaust-packages) |
+| How do R programming assignments work? |  |
+
+**Module 3: Programming in Python**
+
+| Course item | Companion topic |
+| --- | --- |
+| Introduction to the module |  |
+| Lecture: Python and R | [Python and R side by side](../index.html#/c/kaust/kaust-python-r) |
+| The Python ecosystem | [Python and R side by side](../index.html#/c/kaust/kaust-python-r) |
+| Python installation and environments | [Python installation, environments and Jupyter Lab](../index.html#/c/kaust/kaust-py-setup) |
+| Jupyter Lab | [Python installation, environments and Jupyter Lab](../index.html#/c/kaust/kaust-py-setup) |
+| Lecture: Python native data structures | [Lists, tuples, sets and dictionaries](../index.html#/c/kaust/kaust-py-structures) |
+| Coding Lecture: Fundamentals in data types | [Lists, tuples, sets and dictionaries](../index.html#/c/kaust/kaust-py-structures) |
+| Coding Lecture: Lists and Tuples | [Lists, tuples, sets and dictionaries](../index.html#/c/kaust/kaust-py-structures) |
+| Coding Lecture: Sets and Dictionaries | [Lists, tuples, sets and dictionaries](../index.html#/c/kaust/kaust-py-structures) |
+| Lecture: flow control and functions. | [if, for and while in Python](../index.html#/c/kaust/kaust-py-flow) |
+| Coding Lecture: if conditions, for and while loops. | [if, for and while in Python](../index.html#/c/kaust/kaust-py-flow) |
+| Coding Lecture: declare and using functions in Python | [Writing functions in Python](../index.html#/c/kaust/kaust-py-functions) |
+| Lecture: overview of modules in Python | [NumPy arrays](../index.html#/c/kaust/kaust-numpy) |
+| Lecture: numpy | [NumPy arrays](../index.html#/c/kaust/kaust-numpy) |
+| Coding Lecture: numpy | [NumPy arrays](../index.html#/c/kaust/kaust-numpy) |
+| Lecture: pandas | [pandas DataFrames](../index.html#/c/kaust/kaust-pandas) |
+| Coding Lecture: pandas | [pandas DataFrames](../index.html#/c/kaust/kaust-pandas) |
+| Coding lecture: pandas for data exploration | [pandas DataFrames](../index.html#/c/kaust/kaust-pandas) |
+| Coding Lecture: Visualization | [Choosing and drawing a plot](../index.html#/c/kaust/kaust-plots) |
+| Free online Python resources |  |
+| Visualization with the pandas package | [Choosing and drawing a plot](../index.html#/c/kaust/kaust-plots) |
+
+**Module 4: Bioinformatics case study: RNA-seq bulk and single-cell data analysis**
+
+| Course item | Companion topic |
+| --- | --- |
+| Overview of the week | [RNA-seq: from cells to a count matrix](../index.html#/c/kaust/kaust-rnaseq) |
+| Lecture: Introduction to the case study | [Genes, RNA and proteins: what RNA-seq measures](../index.html#/c/kaust/kaust-dogma) (background); [RNA-seq: from cells to a count matrix](../index.html#/c/kaust/kaust-rnaseq) |
+| Lecture: RNA-seq technology and data normalisation | [RNA-seq: from cells to a count matrix](../index.html#/c/kaust/kaust-rnaseq); [Sequencing reads: FASTA and FASTQ files](../index.html#/c/kaust/kaust-reads) (background); [Normalizing RNA-seq counts](../index.html#/c/kaust/kaust-normalize) |
+| Coding Lecture: Loading and normalizing RNA-seq data | [Normalizing RNA-seq counts](../index.html#/c/kaust/kaust-normalize) |
+| Lecture: Principal Component Analysis | [Principal component analysis (PCA)](../index.html#/c/kaust/kaust-pca) |
+| Coding Lecture: PCA analysis in R for RNA-seq data | [Principal component analysis (PCA)](../index.html#/c/kaust/kaust-pca) |
+| Lecture: Finding differentially expressed genes | [Finding differentially expressed genes](../index.html#/c/kaust/kaust-de) |
+| Coding Lecture: Differential expression analysis in R | [Finding differentially expressed genes](../index.html#/c/kaust/kaust-de) |
+| Lecture: From RNA-seq to scRNA-seq | [From bulk to single-cell RNA-seq](../index.html#/c/kaust/kaust-scrna) |
+| Lecture: Representing scRNA-seq experiments in Python | [Single-cell data in Python: the AnnData object](../index.html#/c/kaust/kaust-anndata) |
+| Coding Lecture: Loading a scRNA-seq experiment in Python | [Single-cell data in Python: the AnnData object](../index.html#/c/kaust/kaust-anndata) |
+| Lecture: Preprocessing scRNA-seq data | [Preprocessing single-cell data](../index.html#/c/kaust/kaust-sc-preprocess) |
+| Coding Lecture: scRNA-seq preprocessing | [Preprocessing single-cell data](../index.html#/c/kaust/kaust-sc-preprocess) |
+| Lecture: UMAP and dimensionality reduction in single-cell studies | [UMAP, clusters and cell types](../index.html#/c/kaust/kaust-celltypes) |
+| Lecture: Cell type identification | [UMAP, clusters and cell types](../index.html#/c/kaust/kaust-celltypes) |
+| Coding Lecture: Clustering and cell type identification with Python | [UMAP, clusters and cell types](../index.html#/c/kaust/kaust-celltypes) |
+| Coding Lecture: scRNA-seq analysis in R |  |
+| Lecture: bioAI |  |
+| Thanks (for all the fish) |  |
+| Relevant material for Week 4 |  |
+| Reference resources for single-cell analysis in Python |  |
+
+### Python Programming Essentials (Rice University)
+
+**Module 1: Python as a Calculator**
+
+| Course item | Companion topic |
+| --- | --- |
+| Welcome! |  |
+| Course Overview |  |
+| Hello, world! | [Your first program: Hello, world!](../index.html#/c/rice/rice-hello) |
+| Python Development Environments | [Your first program: Hello, world!](../index.html#/c/rice/rice-hello) |
+| Numbers | [Numbers: whole numbers and decimals](../index.html#/c/rice/rice-numbers) |
+| Simple Expressions | [Simple and compound expressions](../index.html#/c/rice/rice-expressions) |
+| Compound Expressions | [Simple and compound expressions](../index.html#/c/rice/rice-expressions) |
+| Variables and Assignment | [Variables and assignment](../index.html#/c/rice/rice-variables) |
+| Handling Errors in Python | [Reading Python error messages](../index.html#/c/rice/rice-errors) |
+| Using CodeSkulptor3 | [Your first program: Hello, world!](../index.html#/c/rice/rice-hello) |
+| A Short Guide to Common Errors in Python | [Reading Python error messages](../index.html#/c/rice/rice-errors) |
+| Practice Exercise for Expressions | [Simple and compound expressions](../index.html#/c/rice/rice-expressions) |
+| Practice Exercises for Variables and Assignments | [Variables and assignment](../index.html#/c/rice/rice-variables) |
+| Basic Python Syntax |  |
+
+**Module 2: Functions**
+
+| Course item | Companion topic |
+| --- | --- |
+| What is a Function? | [What a function is, and calling one](../index.html#/c/rice/rice-calling) |
+| Calling Functions | [What a function is, and calling one](../index.html#/c/rice/rice-calling) |
+| Defining Functions | [Defining your own functions](../index.html#/c/rice/rice-defining) |
+| Local Variables | [Local variables and how a call runs](../index.html#/c/rice/rice-local) |
+| Understanding Function Evaluation | [Local variables and how a call runs](../index.html#/c/rice/rice-local) |
+| Using Print and Return in Functions | [print versus return](../index.html#/c/rice/rice-print-return) |
+| Functions | [Defining your own functions](../index.html#/c/rice/rice-defining) |
+| Practice Exercises for Functions |  |
+
+**Module 3: Logic and Conditionals**
+
+| Course item | Companion topic |
+| --- | --- |
+| Boolean Logic | [Boolean logic: and, or, not](../index.html#/c/rice/rice-boolean) |
+| Logical Expressions | [Boolean logic: and, or, not](../index.html#/c/rice/rice-boolean) |
+| Comparisons | [Comparisons](../index.html#/c/rice/rice-comparisons) |
+| Conditionals | [if, elif and else](../index.html#/c/rice/rice-conditionals) |
+| More Conditionals | [if, elif and else](../index.html#/c/rice/rice-conditionals) |
+| Using Python Documentation | [Python documentation and coding style](../index.html#/c/rice/rice-style) |
+| Following Coding Standards | [Python documentation and coding style](../index.html#/c/rice/rice-style) |
+| Conditionals in Python | [if, elif and else](../index.html#/c/rice/rice-conditionals) |
+| Coding Standards and Style | [Python documentation and coding style](../index.html#/c/rice/rice-style) |
+| Practice Exercises for Logic and Conditionals |  |
+| Logic and Conditionals |  |
+
+**Module 4: Python Modules**
+
+| Course item | Companion topic |
+| --- | --- |
+| Python Modules | [Modules: import and use](../index.html#/c/rice/rice-modules); [Random choices and wrapping around with %](../index.html#/c/rice/rice-random-mod) |
+| The Datetime Module | [The datetime module](../index.html#/c/rice/rice-datetime) |
+| Coding the Practice Project - Part 1 |  |
+| Coding the Practice Project - Part 2 |  |
+| RPSLS Video |  |
+| Project Video |  |
+| Datetime Module Quick Reference | [The datetime module](../index.html#/c/rice/rice-datetime) |
+| Practice Project: Rock-Paper-Scissors-Lizard-Spock |  |
+| Tips for RPSLS | [Random choices and wrapping around with %](../index.html#/c/rice/rice-random-mod) |
+| Project Description: Working with Dates | [The dates project: how to work on it](../index.html#/c/rice/rice-dates-project) |
+| OwlTest: Automated Feedback and Assessment | [The dates project: how to work on it](../index.html#/c/rice/rice-dates-project) |
+| Project: Working with Dates | [The dates project: how to work on it](../index.html#/c/rice/rice-dates-project) |
+
+### Hands-on Introduction to Linux Commands and Shell Scripting (IBM)
+
+**Module 1: Introduction to Linux**
+
+| Course item | Companion topic |
+| --- | --- |
+| Course Introduction |  |
+| Introducing Linux and Unix | [Linux and Unix in one minute](../index.html#/c/ibm/ibm-linux-unix) |
+| Linux Distributions | [Linux distributions](../index.html#/c/ibm/ibm-distros) |
+| Overview of Linux Architecture | [Linux architecture: from hardware to you](../index.html#/c/ibm/ibm-architecture) |
+| Linux Terminal Overview | [The terminal, the shell and the prompt](../index.html#/c/ibm/ibm-terminal) |
+| Creating and Editing Text Files | [Editing text files with nano and Vim](../index.html#/c/ibm/ibm-editors) |
+| Installing Software and Updates | [Installing software and updates](../index.html#/c/ibm/ibm-install) |
+| How to Get the Most from this Hands-On Course |  |
+| Browsing directories with the Linux terminal | [The file system tree](../index.html#/c/ibm/ibm-tree); [Absolute and relative paths](../index.html#/c/ibm/ibm-paths) |
+| Linux Terminal Tips - Tab completion, command history | [Tab completion and command history](../index.html#/c/ibm/ibm-tips) |
+| Module 1 Cheat Sheet - Introduction to Linux |  |
+| Hands-on Lab: Getting Started with the Linux Terminal | [The terminal, the shell and the prompt](../index.html#/c/ibm/ibm-terminal) |
+| Hands-on Lab: Installing and working with text editors | [Editing text files with nano and Vim](../index.html#/c/ibm/ibm-editors) |
+
+**Module 2: Introduction to Linux Commands**
+
+| Course item | Companion topic |
+| --- | --- |
+| Overview of Common Linux Shell Commands | [What a command looks like, and getting help](../index.html#/c/ibm/ibm-anatomy) |
+| Informational Commands | [Informational commands](../index.html#/c/ibm/ibm-info) |
+| File and Directory Navigation Commands | [Moving around: pwd, ls and cd](../index.html#/c/ibm/ibm-navigate) |
+| File and Directory Management Commands | [Creating, copying, moving and deleting](../index.html#/c/ibm/ibm-manage) |
+| Viewing File Content | [Looking inside files](../index.html#/c/ibm/ibm-view) |
+| Useful Commands for Wrangling Text Files | [Wrangling text: sort, uniq, cut, paste, wc](../index.html#/c/ibm/ibm-wrangle); [Searching text with grep](../index.html#/c/ibm/ibm-grep) |
+| Networking Commands | [Networking commands](../index.html#/c/ibm/ibm-network) |
+| File Archiving and Compression Commands | [Archiving and compressing files](../index.html#/c/ibm/ibm-archive) |
+| Getting Help for Linux Commands | [What a command looks like, and getting help](../index.html#/c/ibm/ibm-anatomy) |
+| Security - Managing File Permissions and Ownership | [Permissions and ownership](../index.html#/c/ibm/ibm-permissions) |
+| A Brief Introduction to Networking (Optional) | [Networking commands](../index.html#/c/ibm/ibm-network) |
+| Cheat Sheet: Introduction to Linux Commands |  |
+| Hands-on Lab: Informational Commands | [Informational commands](../index.html#/c/ibm/ibm-info) |
+| Hands-on Lab: Navigating and Managing Files and Directories | [Moving around: pwd, ls and cd](../index.html#/c/ibm/ibm-navigate); [Creating, copying, moving and deleting](../index.html#/c/ibm/ibm-manage) |
+| Hands-on Lab: Access Control Commands | [Permissions and ownership](../index.html#/c/ibm/ibm-permissions) |
+| Hands-on Lab: Wrangling Text Files at the Command Line | [Wrangling text: sort, uniq, cut, paste, wc](../index.html#/c/ibm/ibm-wrangle); [Searching text with grep](../index.html#/c/ibm/ibm-grep) |
+| Hands-on Lab: Working with Networking Commands | [Networking commands](../index.html#/c/ibm/ibm-network) |
+| Hands-on Lab: Archiving and Compressing Files | [Archiving and compressing files](../index.html#/c/ibm/ibm-archive) |
+
+**Module 3: Introduction to Shell Scripting**
+
+| Course item | Companion topic |
+| --- | --- |
+| Shell Scripting Basics | [Shell scripts and the shebang](../index.html#/c/ibm/ibm-scripts) |
+| Filters, Pipes, and Variables | [Filters and pipes](../index.html#/c/ibm/ibm-pipes); [Shell and environment variables](../index.html#/c/ibm/ibm-variables) |
+| Useful Features of the Bash Shell | [Redirection, wildcards and other Bash features](../index.html#/c/ibm/ibm-features) |
+| Scheduling Jobs using Cron | [Scheduling jobs with cron](../index.html#/c/ibm/ibm-cron) |
+| A Brief Introduction to Shell Variables | [Shell and environment variables](../index.html#/c/ibm/ibm-variables) |
+| Examples of Pipes | [Filters and pipes](../index.html#/c/ibm/ibm-pipes) |
+| Extracting information from URLs (Additional Reference) |  |
+| Examples of Bash Shell Features | [Redirection, wildcards and other Bash features](../index.html#/c/ibm/ibm-features) |
+| Introduction to Advanced Bash Scripting | [Loops, conditions and arguments in scripts](../index.html#/c/ibm/ibm-advanced) |
+| Cheat Sheet: Introduction to Shell Scripting |  |
+| Hands-on Lab: Getting Started with Shell Scripting | [Shell scripts and the shebang](../index.html#/c/ibm/ibm-scripts) |
+| Hands-on Lab: Advanced Bash Scripting | [Loops, conditions and arguments in scripts](../index.html#/c/ibm/ibm-advanced) |
+| Hands-on Lab: Scheduling Jobs using Crontab | [Scheduling jobs with cron](../index.html#/c/ibm/ibm-cron) |
+
+**Module 4: Final Project and Final Exam**
+
+| Course item | Companion topic |
+| --- | --- |
+| Practice Project Overview | [Before the final project and exam: what to revise](../index.html#/c/ibm/ibm-final) |
+| Cheat Sheet: Linux Commands and Shell Scripting |  |
+| Final Project Overview | [Before the final project and exam: what to revise](../index.html#/c/ibm/ibm-final) |
+| Hands-on Lab: Historical Weather Forecast Comparison to Actuals |  |
+| Hands-On Lab: Final Project |  |
+| Final Exam | [Before the final project and exam: what to revise](../index.html#/c/ibm/ibm-final) |
+
+146 of 177 public course items have at least one Companion topic; 79 topics in total.
+
 ## Gaps and thin spots
 
 Computed automatically: any objective with fewer than 4 bank questions, or with no application-level (L3) question.

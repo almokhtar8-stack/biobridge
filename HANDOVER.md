@@ -1,4 +1,4 @@
-# BioBridge handover (version 2.1.1)
+# BioBridge handover (version 2.2.0)
 
 Use this file to continue the project in a new chat: attach the repository (or upload the BioBridge ZIP) and say "Continue BioBridge from HANDOVER.md".
 
@@ -6,10 +6,16 @@ Use this file to continue the project in a new chat: attach the repository (or u
 
 GitHub Pages publishes from the `gh-pages` branch, which is a copy of `main`. After pushing changes to `main`, publish them with `git push origin main:gh-pages`. To publish straight from `main` instead, set Settings, Pages, Branch to `main` and `/ (root)`.
 
+**Version 2.2.0 is on the branch `dev/2.2` and is not published.** The live site still shows 2.1.1 until the owner approves: merge the pull request from `dev/2.2` into `main`, then run `git push origin main:gh-pages`.
+
 ## Where the project stands
 
 **Finished and tested**
 
+- **2.2 Companion** (default home): 79 lecture-aligned topics in `content/companion-*.js` (26 IBM, 17 Rice, 36 KAUST), each 2 to 4 minutes, built on the public course item titles in `tools/course_items.json` (checked 8 November 2026). Students' journey: `docs/STUDENT-JOURNEY.md`.
+- **76 step-by-step visuals** in `js/diagrams/*.js` (engine `js/widgets/diagrams.js`), each with a text version; the Visual explanations page lists them.
+- **Practice files**: `#/files` page and `assets/downloads/biobridge-practice.zip`, built from the browser terminal's own files by `tools/build_practice_zip.py`.
+- **Explore deeply** (`#/explore`) keeps the 2.1 dashboard; everything below is unchanged from 2.1.1 and optional.
 - 60 lessons across Foundations 0 to 3, every one with all eight parts (what, why, how, show, try, check, connect, teach-back).
 - 22 labs, 14 terminal missions, 16 Python traces, real Python through the bundled Pyodide.
 - 310 bank questions, 25 generators, diagnostic, topic practice, weakest-areas practice, mocks (20 or 40, timed or untimed), review queue, objective-based progress, glossary (273 terms), notebook, study plan, courses page, export, import, reset, migration from 1.0.
@@ -30,7 +36,7 @@ GitHub Pages publishes from the `gh-pages` branch, which is a copy of `main`. Af
 ## Set up a working copy
 
 ```bash
-unzip BioBridge-2.1.1.zip && cd BioBridge && python3 -m http.server 8811
+unzip BioBridge-2.2.0.zip && cd BioBridge && python3 -m http.server 8811
 ```
 
 Open <http://localhost:8811>. For the full test suite you also need Node 18 or later, R (`Rscript`), Python 3 with pandas, NumPy and SciPy, Playwright for Python with Chrome (`pip install playwright` then `playwright install chrome`), and axe-core (`npm install axe-core`). Versions used for the last run are listed in `docs/TESTING.md`.
@@ -50,7 +56,11 @@ Open <http://localhost:8811>. For the full test suite you also need Node 18 or l
 | Question generators | `js/generators.js` |
 | Selection, scoring, review intervals, objective status | `js/practice.js` |
 | Lesson page layout | `js/lesson.js` |
-| Other pages (home, learn, courses, labs, plan, about, notebook, glossary) | `js/pages.js` |
+| Companion topics | `content/companion-ibm.js`, `companion-rice.js`, `companion-kaust-a.js` (R modules), `companion-kaust-b.js` (Python and RNA-seq); rules in `tools/COMPANION_GUIDE.md` |
+| Companion pages, search, visual library | `js/companion.js` |
+| Visual explanations | `js/diagrams/*.js`; engine `js/widgets/diagrams.js`; rules in `tools/DIAGRAM_GUIDE.md`; preview with `tools/diagram_preview.html` and `tools/shoot_diagrams.py` |
+| Practice files page | `js/files.js`; text, tested commands and troubleshooting in `content/practice-files.js`; rebuild the ZIP with `python3 tools/build_practice_zip.py` |
+| Other pages (explore deeply, learn, course map, labs, plan, about, notebook, glossary) | `js/pages.js` |
 | Simulated shell | `js/shell.js`; terminal interface in `js/widgets/terminal.js` |
 | Python runner | `js/widgets/pyrun.js` (Pyodide version and CDN address at the top) |
 | Labs | `js/widgets/*.js` |
@@ -71,10 +81,10 @@ Open <http://localhost:8811>. For the full test suite you also need Node 18 or l
 ## After any content change
 
 ```bash
-node tools/validate.mjs && python3 tools/verify_code.py && node tools/build_coverage.mjs
+node tools/validate.mjs && python3 tools/verify_code.py && node tools/check_companion.mjs && node tools/build_coverage.mjs
 ```
 
-After changing the shell or missions, also run `node tools/test_shell.mjs && node tools/test_missions.mjs`. Before a release, run the end-to-end suite with the site served on port 8811: `python3 tools/test_e2e.py --axe node_modules/axe-core/axe.min.js`.
+After changing the shell or missions, also run `node tools/test_shell.mjs && node tools/test_missions.mjs`. After changing the practice files or `content/practice-files.js`, run `python3 tools/build_practice_zip.py && python3 tools/test_practice.py`. When a course page changes on Coursera, update `tools/course_items.json` first; the checker then reports every topic whose "Helps with" titles no longer exist. Before a release, run the end-to-end suite with the site served on port 8811: `python3 tools/test_e2e.py --axe node_modules/axe-core/axe.min.js`.
 
 ## Questions for a subject expert
 
@@ -89,6 +99,7 @@ The reviewers left these as they are because they are debatable rather than wron
 
 ## Suggested next steps, in order
 
+0. Review the 2.2 pull request on the `dev/2.2` branch, then publish (see the top of this file). Re-check the three course pages on Coursera every few months and update `tools/course_items.json`.
 1. Open the site on a real iPhone, an Android phone and an iPad, and in Safari and Firefox on a laptop. Check the terminal keyboard, the Python editor and the volcano plot first, because they depend most on the browser.
 2. Do a short screen-reader pass (VoiceOver on iOS or macOS, NVDA on Windows) on a lesson, a mission and a mock assessment.
 3. Pilot with a few students. Note which questions most people miss and which lessons feel long, then revise those first.

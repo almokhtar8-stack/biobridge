@@ -1,5 +1,48 @@
 # Changelog
 
+## 2.2.0 (8 November 2026)
+
+BioBridge becomes a Coursera learning companion. The default experience is now fast and lecture-aligned; the full
+path from 2.1 is kept, unchanged and optional. Saved progress from 2.0 and 2.1 keeps working. The student journey is
+described in `docs/STUDENT-JOURNEY.md` and the test results in `docs/TESTING.md`.
+
+### Added
+
+- **Quick Companion (new home page).** It asks "Which course and topic are you studying right now?", shows the three
+  courses and has a search box that jumps straight to a topic (by title, keyword, command or lecture name).
+- **79 lecture-aligned topics**: 26 for IBM Linux, 17 for Rice Python and 36 for KAUST Fundamental Skills in
+  Bioinformatics, organized by module and by the public item titles of each course (checked 8 November 2026). Each
+  topic has a short explanation, why it matters, a visual, a tiny verified example, an optional try-it, a common
+  mistake and one unscored question, and links to the official course page. No lecture timestamps, slides, quizzes
+  or assignments are reproduced, and project topics list skills to revise, never solutions.
+- **76 original step-by-step visuals** with a caption for every step and a text version: the Linux tree, absolute
+  and relative paths, how commands change files, pipes, permissions, scripts, cron; Python variables, expressions,
+  functions, call frames, conditionals and loops; R vectors and data structures; DNA to RNA to protein, FASTA and
+  FASTQ, the RNA-seq workflow, count matrices and normalization; t-test, ANOVA, p-values, correlation, linear models,
+  PCA, volcano plots and single-cell analysis. A Visual explanations page lists them all.
+- **Practice files page and download.** The heat-shock project as a 4 KB ZIP (`assets/downloads/biobridge-practice.zip`,
+  built from the browser terminal's own files) or file by file, with previews, a beginner README, two clearly
+  separated routes (browser simulation or your own computer, with macOS, Linux and Windows steps), 19 tested
+  commands with exact outputs, R and pandas snippets, troubleshooting and five challenges.
+- **Explore deeply page** (`#/explore`): the 2.1 home dashboard (next actions, foundations, method, discovery story).
+- Tools: `tools/check_companion.mjs` (topic schema, course item titles, word budget and minute estimates, real
+  execution, simulator agreement), `tools/test_practice.py` (ZIP reproducibility and contents, every command in real
+  Bash and the simulator, under two locales), `tools/build_practice_zip.py`, `tools/shoot_diagrams.py` and
+  `tools/diagram_preview.html` (visual checks), `tools/course_items.json` (verified course item titles), and guides
+  `tools/COMPANION_GUIDE.md` and `tools/DIAGRAM_GUIDE.md`.
+
+### Changed
+
+- Navigation: Companion, Files and Explore lead; the phone tab bar is Companion, Files, Explore, Practice and More.
+  Lessons, labs, review, progress and the other tools stay in the top bar (desktop) and the menu.
+- The old "Course companion" page is now the **Course map** (BioBridge lessons per Coursera module) and points to the
+  Companion for single lecture topics. The study plan describes the new way of working.
+- The practice project's README is now a beginner guide (same first line, so existing questions still hold).
+- The terminal widget accepts suggested commands and a task, so topics can open it in the right folder.
+- `tools/validate.mjs` checks Companion topics and the practice-files content and adds every topic example to the
+  real-execution jobs (279 in total); `tools/test_e2e.py` covers every topic and visual route plus Companion, search,
+  visual stepper, try-it and download flows, and runs axe on the new pages.
+
 ## 2.1.1 (7 November 2026)
 
 A correctness release. The navy and gold design is unchanged, and saved progress from 2.0 and 2.1.0 keeps working. Details, reproductions and root causes are in `docs/RELEASE-2.1.1.md`.

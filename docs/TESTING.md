@@ -1,5 +1,53 @@
 # BioBridge testing and limitations report
 
+## Version 2.2.0 (8 November 2026)
+
+Every suite below was run on the `dev/2.2` branch in this environment (Python 3.13, R 4.3.3, Bash 5.2, Node 22,
+Chrome through Playwright 1.63, axe-core 4.14), with the site served over http. Numbers are copied from the last
+lines of each run.
+
+| Suite | Command | Result |
+| --- | --- | --- |
+| Content structure, including Companion topics and practice-file text | `node tools/validate.mjs` | No errors: 79 Companion topics, 76 visuals (all used by a topic), 60 lessons, 310 questions, 273 glossary terms |
+| Code shown to learners, by execution | `python3 tools/verify_code.py` | 279 of 279 match (198 from 2.1 plus 81 new Companion examples and own-computer exercises) |
+| Companion topics (new) | `node tools/check_companion.mjs` | 79 of 79 pass: schema, exact public course item titles, word budget, every example run for real and, for Bash, also in the simulated terminal, every suggested terminal command succeeds in the simulator |
+| Practice files and ZIP (new) | `python3 tools/test_practice.py` | 59 of 59: the ZIP rebuilds byte for byte, holds exactly the simulator's files with the same contents and permissions, and all 19 documented commands, 5 challenges and the R and pandas snippets print the documented output in real Bash on the extracted ZIP and in the simulator, in the C and C.UTF-8 locales |
+| Simulated terminal against real Bash | `node tools/test_shell.mjs` | 190 of 190 identical |
+| Terminal missions | `node tools/test_missions.mjs` | 78 of 78 steps pass |
+| Question generators | `node tools/test_generators.mjs 30` | 750 variants, 390 executed checks, 0 problems |
+| Statistics against SciPy | `node tools/test_stats.mjs` | All match |
+| Browser: sessions, timers, storage, links | `python3 tools/test_sessions.py` | 44 of 44 (the link crawl now starts from the Companion home) |
+| Browser: every route, flows, visuals, accessibility | `python3 tools/test_e2e.py --axe ...` | 69 of 69; 258, 258 and 288 routes at phone, tablet and desktop sizes (every topic and visual included) with no JavaScript errors and no horizontal overflow; axe-core: 0 violations of any severity in light and dark themes |
+| Phone layout (39 pages at 320, 360 and 390 px and landscape) | `python3 tools/phone_audit.py` | No horizontal overflow; no text field under 16 px |
+
+What the new browser checks cover:
+
+- **Every page renders**: all 79 topic pages and 76 visual pages at phone, tablet and desktop sizes, plus every
+  older route, with no JavaScript errors and no sideways scrolling.
+- **Companion flows (phone)**: the home question and three course cards (all within the first two screens); search
+  finds `grep` and `t-test` topics, matches short words such as `cd` only as whole words, and explains when nothing
+  matches; course pages list 4 modules; topic pages show the course items they help with and the time; a visual steps
+  forward and back with a caption and a text version for every step; the quick check gives feedback but records no
+  attempt, review item or session; opening a topic is remembered and offered on the home page; a suggested command
+  fills and runs in the browser terminal; an own-computer exercise links to the practice files and shows a verified
+  expected output.
+- **Practice files (phone)**: the ZIP link downloads a real ZIP; all 9 file cards are present; a file can be previewed
+  before downloading; a single-file download has exactly the simulator's content; the page states that the browser
+  terminal cannot open downloaded files; the browser route opens a terminal in `~/project` with the same files.
+- **Visuals (desktop)**: each of the 76 visuals returns exactly to its first state after stepping to the end and back,
+  and every step has its own caption.
+- **Accessibility**: axe-core on 22 pages (including the Companion home, course and topic pages, practice files,
+  visual library and Explore deeply) in light and dark themes, with every collapsible section opened.
+
+**Workload.** The Companion adds no required task. The content checker estimates each topic at 2.1 to 3.7 minutes of
+reading, looking and example (budget 2 to 4); the try-it and the quick check are optional and unscored, which the
+browser test confirms.
+
+Not tested in 2.2.0: real phones and tablets, Safari, Firefox, screen readers, CodeSkulptor3 itself, RStudio and
+Jupyter as programs (their code was run with Rscript and python3), Windows and macOS terminals (commands were run in
+GNU Bash; macOS spacing differences are documented on the page), and the live site, which stays on 2.1.1 until the
+owner approves publishing.
+
 ## Version 2.1.1 (7 November 2026)
 
 Every suite below was run on the `release/2.1.1` branch in this environment, served over http. Logs from these runs are kept outside the site; the numbers are copied from their last lines.
