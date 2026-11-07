@@ -1,6 +1,6 @@
 # BioBridge 2.1.1 release report
 
-Branch `release/2.1.1`, based on `main` at 2.1.0 (commit `5be43bf`). Every problem below was reproduced with an automated browser test before it was fixed, and the same test passes after the fix. The tests are in `tools/test_sessions.py`.
+Built on 2.1.0 (the navy and gold release). Every problem below was reproduced with an automated browser test before it was fixed, and the same test passes after the fix. The tests are in `tools/test_sessions.py`.
 
 ## Reported problems
 
@@ -77,17 +77,15 @@ One limitation: attempts already recorded twice by 2.1.0 are not removed, becaus
 
 ## Deploying
 
-Nothing has been merged or published. The live site still runs 2.1.0.
+2.1.1 is published at <https://almokhtar8-stack.github.io/biobridge/> from the repository <https://github.com/almokhtar8-stack/biobridge>.
 
-1. Open the pull request from `release/2.1.1` into `main`, review it, and merge it.
-2. Publish. GitHub Pages currently serves the `gh-pages` branch, so after merging run this from any clone:
+GitHub Pages serves the `gh-pages` branch, which is a copy of `main`. To publish a later change, push it to `main`, then run:
 
-   ```bash
-   git fetch origin && git push origin origin/main:gh-pages
-   ```
+```bash
+git fetch origin && git push origin origin/main:gh-pages
+```
 
-   Alternatively, set Settings, Pages, Branch to `main` and `/ (root)` once; after that, every merge into `main` publishes on its own.
-3. Open the live site and check that the About page shows version 2.1.1.
+Alternatively, set Settings, Pages, Branch to `main` and `/ (root)` once; after that, every push to `main` publishes on its own. After publishing, check that the About page shows the new version.
 
 ## Before inviting students
 

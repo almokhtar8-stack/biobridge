@@ -2,7 +2,7 @@
 
 Use this file to continue the project in a new chat: attach the repository (or upload the BioBridge ZIP) and say "Continue BioBridge from HANDOVER.md".
 
-**Repository:** <https://github.com/almokhtar8-stack/academy-prep-BI>. **Live site:** <https://almokhtar8-stack.github.io/academy-prep-BI/>.
+**Repository:** <https://github.com/almokhtar8-stack/biobridge>. **Live site:** <https://almokhtar8-stack.github.io/biobridge/>.
 
 GitHub Pages publishes from the `gh-pages` branch, which is a copy of `main`. After pushing changes to `main`, publish them with `git push origin main:gh-pages`. To publish straight from `main` instead, set Settings, Pages, Branch to `main` and `/ (root)`.
 

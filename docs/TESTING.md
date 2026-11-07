@@ -26,7 +26,7 @@ New regression checks in `tools/test_sessions.py` and what they cover:
 - **Diagnostic:** "I don't know yet" is always the last option.
 - **Links:** every in-site link on every main page and lesson (100 links) opens a real page or section.
 
-Not tested in 2.1.1: real phones and tablets, Safari, Firefox, screen readers, and the live GitHub Pages site (this environment cannot reach github.io). The deployed site was not changed: it still serves 2.1.0 until the release branch is merged and published.
+Not tested in 2.1.1: real phones and tablets, Safari, Firefox, screen readers, and the live GitHub Pages site (this environment cannot reach github.io). The release was then published to GitHub Pages; the live site itself was not tested from this environment.
 
 ## Earlier report (2.0.0 and 2.1.0)
 

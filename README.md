@@ -2,7 +2,7 @@
 
 Version 2.1.1. See `CHANGELOG.md` for what changed.
 
-**Live site:** <https://almokhtar8-stack.github.io/academy-prep-BI/>
+**Live site:** <https://almokhtar8-stack.github.io/biobridge/>
 
 BioBridge is a free, beginner-first study companion for students in the KAUST Academy Bioinformatics Program who must finish three Coursera courses before the placement assessment:
 
