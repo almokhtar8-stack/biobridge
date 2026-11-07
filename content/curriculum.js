@@ -9,7 +9,7 @@ BB.config = {
   deadlineLabel: '5 December 2026',
   storageKey: 'biobridge-v2',
   legacyStorageKey: 'biobridge-v1',
-  version: '2.0.0'
+  version: '2.1.0', repoUrl: 'https://github.com/almokhtar8-stack/academy-prep-BI'
 };
 
 BB.courses = {

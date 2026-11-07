@@ -44,7 +44,7 @@
     const stepper = h('nav.stepper', { 'aria-label': 'Lesson sections' }, SECTIONS.filter(([k]) => k !== 'try' || L.try).map(([k, label]) => h('a', { href: '#/lesson/' + id, 'data-go': k, onclick: (e) => { e.preventDefault(); const t = document.getElementById('sec-' + k); if (t) { t.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); t.querySelector('h2, .eyebrow').setAttribute('tabindex', '-1'); } } }, label)));
 
     const head = h('header.lesson-top',
-      h('div.small.muted', h('a', { href: '#/learn/' + (f ? f.id : '') }, f ? f.short : 'Learn'), ' / ', u ? u.title : ''),
+      h('div.crumbs', h('a', { href: '#/learn/' + (f ? f.id : '') }, f ? f.short : 'Learn'), ' / ', u ? u.title : ''),
       h('h1', meta.title),
       h('div.chips', h('span.chip', BB.ui.icon('clock'), `${meta.min} min`), h('span.chip.' + alignColor, alignLabel), meta.courses.map((c) => h('a.chip.accent', { href: '#/courses', title: BB.courses[c.split('-m')[0]].name }, courseLabel(c)))),
       h('details.deeper', { style: { marginTop: '12px' } }, h('summary', 'What you will be able to do'), h('div', h('ul', meta.obj.map((o) => h('li', 'I can ' + BB.objectives[o].label.charAt(0).toLowerCase() + BB.objectives[o].label.slice(1) + '.'))), meta.pre.length ? h('p.small.muted', 'Builds on: ', meta.pre.map((p, i) => [i ? ', ' : '', h('a', { href: '#/lesson/' + p }, BB.lessonMeta[p].title)])) : null)));

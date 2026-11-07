@@ -78,7 +78,7 @@
       let list = rows.slice();
       if (sortKey != null) list.sort((a, b) => val(b, sortKey) - val(a, sortKey));
       tableWrap.innerHTML = '';
-      const head = h('tr', h('th', 'gene'), D.samples.map((s, j) => h('th.num', h('button', { type: 'button', style: { border: 0, background: 'none', font: 'inherit', color: sortKey === j ? 'var(--accent)' : 'inherit', cursor: 'pointer', textTransform: 'inherit', letterSpacing: 'inherit' }, 'aria-label': `Sort by ${s}`, onclick: () => { sortKey = sortKey === j ? null : j; draw(); } }, s, sortKey === j ? ' ↓' : ''))));
+      const head = h('tr', h('th', 'gene'), D.samples.map((s, j) => h('th.num', h('button', { type: 'button', style: { border: 0, background: 'none', font: 'inherit', color: 'inherit', textDecoration: sortKey === j ? 'underline' : 'none', textDecorationThickness: '2px', textUnderlineOffset: '4px', cursor: 'pointer', textTransform: 'inherit', letterSpacing: 'inherit' }, 'aria-label': `Sort by ${s}`, onclick: () => { sortKey = sortKey === j ? null : j; draw(); } }, s, sortKey === j ? ' ↓' : ''))));
       const body = h('tbody', list.map((g) => h('tr' + (g.g === selGene ? '.hl' : ''), { tabindex: '0', style: { cursor: 'pointer' }, onclick: () => { selGene = g.g; draw(); }, onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selGene = g.g; draw(); } } }, h('td', h('strong', g.g)), D.samples.map((s, j) => h('td.num', fmtv(val(g, j)))))));
       const foot = h('tr', h('td', h('em', 'library size')), D.libsize.map((l) => h('td.num', h('em', (l / 1e6).toFixed(1) + 'M'))));
       tableWrap.append(h('table.data', h('thead', head), body, h('tfoot', foot)));

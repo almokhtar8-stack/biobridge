@@ -28,15 +28,7 @@
       a.run ? h('button.btn.btn-primary', { type: 'button', onclick: a.run }, a.cta) : h('a.btn.btn-primary', { href: a.href }, a.cta));
   }
 
-  function helixSVG() {
-    // a vertical double helix: two phase-shifted sine strands with base-pair rungs
-    const W = 120, H = 300, A = 38, cx = W / 2, turns = 2.2;
-    const pt = (y, phase) => cx + A * Math.sin((y / H) * turns * 2 * Math.PI + phase);
-    let s1 = '', s2 = '', rungs = '';
-    for (let y = 0; y <= H; y += 4) { s1 += (y ? 'L' : 'M') + pt(y, 0).toFixed(1) + ' ' + y + ' '; s2 += (y ? 'L' : 'M') + pt(y, Math.PI).toFixed(1) + ' ' + y + ' '; }
-    for (let y = 10; y < H; y += 17) rungs += `<line x1="${pt(y, 0).toFixed(1)}" y1="${y}" x2="${pt(y, Math.PI).toFixed(1)}" y2="${y}"/>`;
-    return `<svg viewBox="0 0 ${W} ${H}" fill="none" stroke-linecap="round"><g stroke="#2f6f69" stroke-width="3">${rungs}</g><path d="${s1}" stroke="#9be6d2" stroke-width="5"/><path d="${s2}" stroke="#5fb8a8" stroke-width="5"/></svg>`;
-  }
+
   function home() {
     const st = S();
     const total = Object.keys(BB.lessonMeta).length, done = BB.lessonsDone();
@@ -48,21 +40,22 @@
     const SEQ = [['What is it?', 'A plain definition first.'], ['Why does it exist?', 'The problem it solves.'], ['How does it work?', 'Step by step.'], ['Show me', 'A worked example with real output.'], ['Let me try', 'A lab, terminal or code activity.'], ['Test my understanding', 'Feedback that explains mistakes.'], ['Connect it', 'Where it matters in real science.']];
     return h('div',
       h('section.hero',
-        h('div.hero-art', { 'aria-hidden': 'true', html: helixSVG() }),
-        h('div.eyebrow', 'Your first real step into bioinformatics'),
-        h('h1', 'You do not need a background. You need the why.'),
-        h('p', 'Learn biology, Linux, Python, R and statistics from absolute zero, see how each tool supports real discoveries, and prepare for the KAUST Academy placement assessment with original practice questions.'),
-        h('div.btn-row',
-          fresh ? h('button.btn.btn-primary', { type: 'button', onclick: () => { BB.practice.startDiagnostic(); BB.go('/practice/session'); } }, 'Find my starting point (15 min)') : cont ? h('a.btn.btn-primary', { href: '#/lesson/' + cont.id }, 'Continue: ' + BB.lessonMeta[cont.id].title) : h('a.btn.btn-primary', { href: '#/practice' }, 'Go to practice'),
-          h('a.btn.btn-ghost', { href: '#/lesson/f0-bioinformatics' }, fresh ? 'Start from absolute zero' : 'Browse all lessons'))),
-      h('div.stats', { style: { marginTop: '14px' } },
+        h('div.confetti', { 'aria-hidden': 'true' }, Array.from({ length: 12 }, () => h('span'))),
+        h('div.hero-inner',
+          h('h1', 'Your ', h('span.hl', 'bridge'), ' into bioinformatics'),
+          h('p.hero-lead', 'You do not need a background. You need the why. Learn biology, Linux, Python, R and statistics from absolute zero, see how each tool supports real discoveries, and prepare for the KAUST Academy placement assessment with original practice questions.'),
+          h('div.btn-row',
+            fresh ? h('button.btn.btn-primary', { type: 'button', onclick: () => { BB.practice.startDiagnostic(); BB.go('/practice/session'); } }, 'Find my starting point (15 min)') : cont ? h('a.btn.btn-primary', { href: '#/lesson/' + cont.id }, 'Continue: ' + BB.lessonMeta[cont.id].title) : h('a.btn.btn-primary', { href: '#/practice' }, 'Go to practice'),
+            h('a.btn.btn-ghost', { href: '#/lesson/f0-bioinformatics' }, fresh ? 'Start from absolute zero' : 'Browse all lessons')),
+          h('p.hero-note', 'Independent study companion. Not an official KAUST, KAUST Academy or Coursera site.'))),
+      h('div.stats.lifted',
         h('div.stat', h('strong', days ? `${days} day${days === 1 ? '' : 's'}` : 'Deadline passed'), h('span', `until ${BB.config.deadlineLabel} (your cohort's course deadline)`)),
         h('div.stat', h('strong', `${done} / ${total}`), h('span', 'lessons explained in your own words')),
         h('div.stat', h('strong', String(BB.practice.dueCount())), h('span', 'review items due')),
         h('div.stat', h('strong', week.length ? pct(week.filter((a) => a.c).length, week.length) + '%' : 'n/a'), h('span', 'practice accuracy, last 7 days'))),
-      h('div.section-head', h('div', h('h2', 'Your next useful actions'), h('p', 'Chosen from your diagnostic, lessons and review queue.'))),
+      h('div.section-head.center', h('div.eyebrow', 'Start here'), h('h2', 'Your next useful actions'), h('p', 'Chosen from your diagnostic, lessons and review queue.')),
       h('div.stack', nextActions().map(actionCard)),
-      h('div.section-head', h('div', h('h2', 'Four foundations'), h('p', 'One connected journey, ordered so that each idea builds on the one before.'))),
+      h('div.section-head.center', h('div.eyebrow', 'Your learning path'), h('h2', 'Four foundations'), h('p', 'One connected journey, ordered so that each idea builds on the one before.')),
       h('div.grid-2', BB.foundations.map((f) => {
         const ids = lessonsIn(f), d = doneIn(ids);
         return h('a.card.card-link', { href: '#/learn/' + f.id },
@@ -71,12 +64,12 @@
           h('div.row.between', { style: { marginTop: '10px' } }, h('span.small', `${d}/${ids.length} lessons explained`), h('span.small.muted', `${ids.reduce((s, id) => s + BB.lessonMeta[id].min, 0)} min`)),
           h('div.meter', { style: { marginTop: '6px' } }, h('span', { style: { width: pct(d, ids.length) + '%' } })));
       })),
-      h('div.section-head', h('div', h('h2', 'How every lesson works'), h('p', 'Short sections, one idea at a time, with optional depth when you want it.'))),
+      h('div.section-head.center', h('div.eyebrow', 'The method'), h('h2', 'How every lesson works'), h('p', 'Short sections, one idea at a time, with optional depth when you want it.')),
       h('div.grid-4', SEQ.map(([t, d], i) => h('div.card.flat', h('div.eyebrow', `Step ${i + 1}`), h('h3', t), h('p.small.muted', d)))),
-      h('div.section-head', h('div', h('h2', 'How a basic skill becomes a discovery'), h('p', 'Real question: what do human cells switch on when they overheat?'))),
+      h('div.section-head.center', h('div.eyebrow', 'Why it matters'), h('h2', 'How a basic skill becomes a discovery'), h('p', 'Real question: what do human cells switch on when they overheat?')),
       h('div.grid-4', [['Biology', 'Ask what changed', 'Heat can switch genes on.', 'f0-expression'], ['Linux', 'Handle the reads', 'Millions of reads live in files on a server.', 'f1-bio-recipes'], ['Python and R', 'Build the table', 'Count reads per gene, compare samples fairly.', 'f3-counts'], ['Statistics', 'Find real changes', 'Separate signal from noise across 20,000 genes.', 'f3-de']].map(([e, t, d, id]) => h('a.card.card-link', { href: '#/lesson/' + id }, h('div.eyebrow', e), h('h3', t), h('p.small.muted', d)))),
       h('div.callout.info', { style: { marginTop: '12px' } }, h('strong', 'Where the courses fit: '), 'Linux handles files and workflows, Python organizes and processes data, R tests patterns and draws plots, and statistics decides what you can trust. Together they turn a biological question into a testable hypothesis, not an automatic answer.'),
-      h('div.section-head', h('div', h('h2', 'Built around your three Coursera courses'), h('p', 'The course companion maps every module to the lessons that support it.'))),
+      h('div.section-head.center', h('div.eyebrow', 'Course companion'), h('h2', 'Built around your three Coursera courses'), h('p', 'The course companion maps every module to the lessons that support it.')),
       h('div.grid-3', Object.entries(BB.courses).map(([k, c]) => h('a.card.card-link', { href: '#/courses#' + k }, h('div.eyebrow', c.org), h('h3', c.name), h('p.small.muted', `${c.modules.length} modules`)))),
       h('p.footer-note', 'BioBridge is an independent learning companion. It is not affiliated with, endorsed by or run by KAUST, KAUST Academy, Coursera, Rice University or IBM. The 5 December 2026 date comes from your cohort information; always confirm deadlines and requirements in your official invitation. Practice questions are original and are not official assessment questions.'));
   }
@@ -196,18 +189,18 @@
     } else if (id === 'traces') {
       body = h('div.grid-2', Object.entries(BB.pyPrograms).filter(([pid]) => BB.pyTraces && BB.pyTraces[pid]).map(([pid, p]) => h('a.card.card-link', { href: '#/labs/trace/' + pid }, h('h3', p.title), h('p.small.muted', `${BB.pyTraces[pid].steps.length} steps \u00b7 ${(BB.pyTraces[pid].asks || []).length} predictions`), S().traces[pid] ? h('span.chip.green', 'Completed') : null)));
     } else body = make();
-    return h('div', h('div.small.muted', h('a', { href: '#/labs' }, 'Labs'), ' / ', group), h('div.page-head', h('h1', title), h('p', desc)), body,
+    return h('div', h('div.page-head', h('div.crumbs', h('a', { href: '#/labs' }, 'Labs'), ' / ', group), h('h1', title), h('p', desc)), body,
       lessons.length ? h('div.btn-row', { style: { marginTop: '16px' } }, h('span.small.muted', 'Learn the idea in:'), lessons.map((l) => h('a.btn.btn-sm.btn-ghost', { href: '#/lesson/' + l }, BB.lessonMeta[l].title))) : null);
   }
   function missionPage(params) {
     const m = BB.missions[params.id];
     if (!m) { BB.go('/labs/missions', true); return null; }
-    return h('div', h('div.small.muted', h('a', { href: '#/labs' }, 'Labs'), ' / ', h('a', { href: '#/labs/missions' }, 'Terminal missions')), h('div.page-head', h('h1', m.title)), BB.widgets.terminal({ mission: params.id }));
+    return h('div', h('div.page-head', h('div.crumbs', h('a', { href: '#/labs' }, 'Labs'), ' / ', h('a', { href: '#/labs/missions' }, 'Terminal missions')), h('h1', m.title)), BB.widgets.terminal({ mission: params.id }));
   }
   function tracePage(params) {
     const p = BB.pyPrograms[params.id];
     if (!p) { BB.go('/labs/traces', true); return null; }
-    return h('div', h('div.small.muted', h('a', { href: '#/labs' }, 'Labs'), ' / ', h('a', { href: '#/labs/traces' }, 'Be the computer')), h('div.page-head', h('h1', p.title)), BB.widgets.trace({ program: params.id }));
+    return h('div', h('div.page-head', h('div.crumbs', h('a', { href: '#/labs' }, 'Labs'), ' / ', h('a', { href: '#/labs/traces' }, 'Be the computer')), h('h1', p.title)), BB.widgets.trace({ program: params.id }));
   }
 
   function glossaryPage(params, query) {

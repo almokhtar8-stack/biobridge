@@ -1,6 +1,6 @@
 # BioBridge 2.0 testing and limitations report
 
-Version 2.0.0, tested 7 November 2026. Every number below comes from the last full run of the test suites in `tools/`. The commands are listed in `README.md`.
+Version 2.0.0, tested 7 November 2026. Version 2.1.0 (the navy and gold restyle) was re-tested with the full browser suite, the accessibility audit in both themes and the phone layout checks below; all pass. Every number below comes from the last full run of the test suites in `tools/`. The commands are listed in `README.md`.
 
 ## Results at a glance
 

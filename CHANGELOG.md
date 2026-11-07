@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.0 (7 November 2026)
+
+### Changed
+
+- New look in a navy and gold course-site style: a navy top bar with uppercase links and a gold underline for the current page, a home hero with a highlighted title and confetti shapes, full-width navy title bands on every page, centered section titles with gold labels, white cards that lift on hover, pill buttons, navy table headers and a cream footer.
+- BioBridge keeps its own name and bridge mark (now gold on navy). The independence notice appears in the hero and in a new footer on every page, so the site cannot be mistaken for an official KAUST Academy page.
+- Desktop navigation moved from a sidebar to the top bar; phones keep the bottom tab bar, and the menu now opens from the right, next to its button.
+- Gold is used for fills, underlines and icons; gold text uses a darker shade so it stays readable. The accessibility audit still reports no violations in light or dark theme.
+
 ## 2.0.0 (7 November 2026)
 
 BioBridge 2.0 rebuilds version 1.0 from a single 90 KB HTML page into a static multi-file site with the teaching content stored as data, a real practice engine, real Python, a much deeper terminal simulation and a full test suite. Everything below was checked by the tests described in `docs/TESTING.md`.

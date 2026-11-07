@@ -50,13 +50,13 @@
   const icon = (name) => { const s = document.createElement('span'); s.innerHTML = ICONS[name] || ''; s.style.display = 'contents'; return s; };
 
   const NAV = [
-    { id: 'home', label: 'Home', href: '#/', icon: 'home', tab: true },
-    { id: 'learn', label: 'Learn', href: '#/learn', icon: 'learn', tab: true },
-    { id: 'courses', label: 'Course companion', href: '#/courses', icon: 'courses' },
-    { id: 'labs', label: 'Interactive labs', href: '#/labs', icon: 'labs' },
-    { id: 'practice', label: 'Placement practice', href: '#/practice', icon: 'practice', tab: true, short: 'Practice' },
-    { id: 'review', label: 'Review queue', href: '#/review', icon: 'review', tab: true, short: 'Review' },
-    { id: 'progress', label: 'Progress', href: '#/progress', icon: 'progress' },
+    { id: 'home', label: 'Home', href: '#/', icon: 'home', tab: true, top: 'Home' },
+    { id: 'learn', label: 'Learn', href: '#/learn', icon: 'learn', tab: true, top: 'Learn' },
+    { id: 'courses', label: 'Course companion', href: '#/courses', icon: 'courses', top: 'Courses' },
+    { id: 'labs', label: 'Interactive labs', href: '#/labs', icon: 'labs', top: 'Labs' },
+    { id: 'practice', label: 'Placement practice', href: '#/practice', icon: 'practice', tab: true, short: 'Practice', top: 'Practice' },
+    { id: 'review', label: 'Review queue', href: '#/review', icon: 'review', tab: true, short: 'Review', top: 'Review' },
+    { id: 'progress', label: 'Progress', href: '#/progress', icon: 'progress', top: 'Progress' },
     { id: 'glossary', label: 'Glossary', href: '#/glossary', icon: 'glossary' },
     { id: 'notebook', label: 'My explanations', href: '#/notebook', icon: 'notebook' },
     { id: 'plan', label: 'Study plan', href: '#/plan', icon: 'plan' },
@@ -85,28 +85,33 @@
   function buildShell() {
     const app = $('#app');
     app.innerHTML = '';
-    const done = BB.lessonsDone ? BB.lessonsDone() : 0;
-    const total = Object.keys(BB.lessonMeta).length;
-    const side = h('aside.sidebar', { 'aria-label': 'Sidebar' },
-      h('a.brand', { href: '#/' }, h('span.mark', { html: ICONS.bridge }), h('span', 'BioBridge', h('small', 'Bioinformatics foundations'))),
-      navLinks(true),
-      h('div.side-meter', { id: 'side-meter' }, h('strong', `${done} / ${total}`), 'lessons explained in your own words', h('div.meter', h('span', { style: { width: BB.pct(done, total) + '%' } }))),
-      h('div.side-foot', 'Independent learning companion. Not affiliated with, endorsed by or run by KAUST, KAUST Academy, Coursera, Rice University or IBM.'));
+    const brand = () => h('a.brand', { href: '#/', 'aria-label': 'BioBridge home' }, h('span.mark', { html: ICONS.bridge }), h('span.brand-text', 'BioBridge', h('small', 'Bioinformatics foundations')));
+    const topnav = h('nav.topnav', { 'aria-label': 'Main' },
+      NAV.filter((n) => n.top).map((n) => h('a', { href: n.href, 'data-nav': n.id }, n.top)),
+      h('button', { type: 'button', 'aria-label': 'More pages', onclick: () => openDrawer('nav-drawer') }, 'More'));
     const top = h('header.topbar',
-      h('button.icon-btn.menu-btn', { type: 'button', 'aria-label': 'Open menu', onclick: () => openDrawer('nav-drawer') }, icon('menu')),
-      h('a.brand', { href: '#/' }, h('span.mark', { html: ICONS.bridge }), 'BioBridge'),
-      h('div.crumb', { id: 'crumb', 'aria-live': 'polite' }),
-      h('div.actions',
-        h('button.icon-btn', { type: 'button', id: 'gloss-btn', 'aria-label': 'Open glossary', title: 'Glossary', onclick: () => openGlossary() }, icon('glossary')),
-        h('button.icon-btn', { type: 'button', id: 'theme-btn', 'aria-label': 'Change color theme', title: 'Theme', onclick: cycleTheme }, icon(themeIcon()))));
+      h('div.topbar-inner',
+        brand(),
+        topnav,
+        h('div.actions',
+          h('button.icon-btn', { type: 'button', id: 'gloss-btn', 'aria-label': 'Open glossary', title: 'Glossary', onclick: () => openGlossary() }, icon('glossary')),
+          h('button.icon-btn', { type: 'button', id: 'theme-btn', 'aria-label': 'Change color theme', title: 'Theme', onclick: cycleTheme }, icon(themeIcon())),
+          h('button.icon-btn.menu-btn', { type: 'button', 'aria-label': 'Open menu', onclick: () => openDrawer('nav-drawer') }, icon('menu')))));
     const main = h('main.main', { id: 'main', tabindex: '-1' });
+    const footer = h('footer.site-footer',
+      h('div.foot-inner',
+        h('p.foot-brand', h('span.mark', { html: ICONS.bridge }), h('strong', 'BioBridge'), h('span', 'Bioinformatics foundations from zero')),
+        h('p', 'An independent study companion for students preparing for the KAUST Academy Bioinformatics Program. It is not an official KAUST, KAUST Academy, Rice University, IBM or Coursera site, and it is not affiliated with or endorsed by them.'),
+        h('p.small', 'Practice questions are original and unofficial. Your progress stays in this browser. Python runs on Pyodide (MPL-2.0).'),
+        h('p.small.foot-links', h('a', { href: '#/about' }, 'About, data and help'), BB.config.repoUrl ? h('a', { href: BB.config.repoUrl, target: '_blank', rel: 'noopener' }, 'Source on GitHub') : null, h('a', { href: '#/glossary' }, 'Glossary'), h('a', { href: '#/plan' }, 'Study plan')),
+        h('p.tiny', '© ' + new Date().getFullYear() + ' BioBridge')));
     const tabbar = h('nav.tabbar', { 'aria-label': 'Quick navigation' },
       NAV.filter((n) => n.tab).map((n) => h('a', { href: n.href, 'data-nav': n.id }, icon(n.icon), h('span', n.short || n.label), n.id === 'review' ? h('span.badge-dot', { id: 'tab-due', hidden: true }) : null)),
       h('button', { type: 'button', 'aria-label': 'More pages', onclick: () => openDrawer('nav-drawer') }, icon('more'), h('span', 'More')));
-    const navDrawer = drawer('nav-drawer', 'Menu', 'left', navLinks(true));
+    const navDrawer = drawer('nav-drawer', 'Menu', 'right', navLinks(true));
     const glossDrawer = drawer('gloss-drawer', 'Glossary', 'right', glossaryPanel());
     const toasts = h('div.toast-zone', { id: 'toasts', role: 'status', 'aria-live': 'polite' });
-    app.append(side, h('div.shell', top, main), tabbar, navDrawer, glossDrawer, toasts);
+    app.append(h('div.shell', top, main, footer), tabbar, navDrawer, glossDrawer, toasts);
     navDrawer.addEventListener('click', (e) => { if (e.target.closest('a')) closeDrawer('nav-drawer'); });
     applyNav();
   }
@@ -193,8 +198,8 @@
     const dark = t === 'dark' || (t === 'system' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
     const meta = document.querySelector('meta[name="theme-color"]');
-    // Match the phone browser bar to the top bar: navy behind the desktop sidebar, the page surface on phones and tablets.
-    if (meta) meta.setAttribute('content', window.innerWidth >= 1024 ? (dark ? '#0c1620' : '#0f1e2c') : (dark ? '#12202c' : '#ffffff'));
+    // Match the phone browser bar to the navy header.
+    if (meta) meta.setAttribute('content', dark ? '#001a33' : '#00264c');
   }
   function cycleTheme() {
     const s = BB.store.state.settings;
