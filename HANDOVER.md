@@ -1,4 +1,4 @@
-# BioBridge 2.0 handover
+# BioBridge handover (version 2.1.1)
 
 Use this file to continue the project in a new chat: attach the repository (or upload the BioBridge ZIP) and say "Continue BioBridge from HANDOVER.md".
 
@@ -30,7 +30,7 @@ GitHub Pages publishes from the `gh-pages` branch, which is a copy of `main`. Af
 ## Set up a working copy
 
 ```bash
-unzip BioBridge-2.0.zip && cd BioBridge && python3 -m http.server 8811
+unzip BioBridge-2.1.1.zip && cd BioBridge && python3 -m http.server 8811
 ```
 
 Open <http://localhost:8811>. For the full test suite you also need Node 18 or later, R (`Rscript`), Python 3 with pandas, NumPy and SciPy, Playwright for Python with Chrome (`pip install playwright` then `playwright install chrome`), and axe-core (`npm install axe-core`). Versions used for the last run are listed in `docs/TESTING.md`.

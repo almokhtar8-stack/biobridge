@@ -1,4 +1,6 @@
-# BioBridge 2.0
+# BioBridge
+
+Version 2.1.1. See `CHANGELOG.md` for what changed.
 
 **Live site:** <https://almokhtar8-stack.github.io/academy-prep-BI/>
 
@@ -92,6 +94,7 @@ python3 tools/build_datasets.py && node tools/validate.mjs && python3 tools/buil
 | `node tools/test_missions.mjs` | Every terminal mission solution passes its checks | Node |
 | `node tools/test_generators.mjs 40` | Question generators: structure, and answers by execution | Node, Python 3, R |
 | `node tools/test_stats.mjs` | In-browser statistics against SciPy values | Node |
+| `python3 tools/test_sessions.py --base http://localhost:8811` | Practice sessions: no duplicate scoring, resuming, timer rules, storage repair, import, in-site links | Playwright for Python with Chrome, the site served |
 | `python3 tools/test_e2e.py --base http://localhost:8811` | Every page at phone, tablet and desktop sizes, plus the main learning flows | Playwright for Python with Chrome, the site served on port 8811 |
 
 Add `--axe path/to/axe.min.js` to the end-to-end run for an automated WCAG 2 A and AA audit. Results of the last full run are in `docs/TESTING.md`.

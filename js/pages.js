@@ -15,11 +15,11 @@
     const path = BB.practice.recommendedPath();
     const nxt = path.find((x) => !x.optional) || path[0];
     if (nxt) { const m = BB.lessonMeta[nxt.id]; acts.push({ icon: 'learn', eyebrow: `Next lesson \u00b7 ${m.min} min`, title: m.title, text: nxt.reason || 'Next in your learning path.', href: '#/lesson/' + nxt.id, cta: (S().lessons[nxt.id] || {}).visited ? 'Continue' : 'Start lesson' }); }
-    if (!S().diagnostic) acts.push({ icon: 'practice', eyebrow: 'About 15 minutes', title: 'Find your starting point', text: 'A short diagnostic builds a personal path and skips what you already know.', href: '#/practice', cta: 'Open practice', run: () => { BB.practice.startDiagnostic(); BB.go('/practice/session'); } });
+    if (!S().diagnostic) acts.push({ icon: 'practice', eyebrow: 'About 15 minutes', title: 'Find your starting point', text: 'A short diagnostic builds a personal path and skips what you already know.', href: '#/practice', cta: 'Open practice', run: () => BB.practice.begin(BB.practice.startDiagnostic) });
     else {
       const st = BB.practice.objectiveStats();
       const weak = Object.entries(st).filter(([, s]) => s.status === 'weak').sort((a, b) => a[1].acc - b[1].acc)[0];
-      if (weak) acts.push({ icon: 'practice', eyebrow: 'Targeted practice', title: BB.objectives[weak[0]].label, text: `Recent accuracy ${Math.round(weak[1].acc * 100)}%. Five fresh questions with explanations.`, cta: 'Practice', run: () => { BB.practice.startTopic({ objective: weak[0], n: 5 }); BB.go('/practice/session'); } });
+      if (weak) acts.push({ icon: 'practice', eyebrow: 'Targeted practice', title: BB.objectives[weak[0]].label, text: `Recent accuracy ${Math.round(weak[1].acc * 100)}%. Five fresh questions with explanations.`, cta: 'Practice', run: () => BB.practice.begin(() => BB.practice.startTopic({ objective: weak[0], n: 5 })) });
     }
     return acts.slice(0, 3);
   }
@@ -45,7 +45,7 @@
           h('h1', 'Your ', h('span.hl', 'bridge'), ' into bioinformatics'),
           h('p.hero-lead', 'You do not need a background. You need the why. Learn biology, Linux, Python, R and statistics from absolute zero, see how each tool supports real discoveries, and prepare for the KAUST Academy placement assessment with original practice questions.'),
           h('div.btn-row',
-            fresh ? h('button.btn.btn-primary', { type: 'button', onclick: () => { BB.practice.startDiagnostic(); BB.go('/practice/session'); } }, 'Find my starting point (15 min)') : cont ? h('a.btn.btn-primary', { href: '#/lesson/' + cont.id }, 'Continue: ' + BB.lessonMeta[cont.id].title) : h('a.btn.btn-primary', { href: '#/practice' }, 'Go to practice'),
+            fresh ? h('button.btn.btn-primary', { type: 'button', onclick: () => BB.practice.begin(BB.practice.startDiagnostic) }, 'Find my starting point (15 min)') : cont ? h('a.btn.btn-primary', { href: '#/lesson/' + cont.id }, 'Continue: ' + BB.lessonMeta[cont.id].title) : h('a.btn.btn-primary', { href: '#/practice' }, 'Go to practice'),
             h('a.btn.btn-ghost', { href: '#/lesson/f0-bioinformatics' }, fresh ? 'Start from absolute zero' : 'Browse all lessons')),
           h('p.hero-note', 'Independent study companion. Not an official KAUST, KAUST Academy or Coursera site.'))),
       h('div.stats.lifted',

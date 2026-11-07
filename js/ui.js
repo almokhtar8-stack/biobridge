@@ -284,7 +284,9 @@
      opts: { mode: 'instant'|'select', retry: bool, onAnswer(correct, chosenIndex, q), mono: bool, seed } */
   function mcq(q, opts = {}) {
     const mode = opts.mode || 'instant';
-    const order = (q.noShuffle || q.options.length <= 2 && /^(true|false)$/i.test(q.options[0].t)) ? q.options.map((_, i) => i) : BB.rng(opts.seed || BB.seed()).shuffle(q.options.map((_, i) => i));
+    const all = q.options.map((_, i) => i);
+    let order = (q.noShuffle || q.options.length <= 2 && /^(true|false)$/i.test(q.options[0].t)) ? all : BB.rng(opts.seed || BB.seed()).shuffle(q.pinLast ? all.slice(0, -1) : all);
+    if (q.pinLast && order.length < all.length) order = order.concat(all.length - 1);
     const mono = opts.mono != null ? opts.mono : !!(q.verify || q.options.some((o) => /\n/.test(o.t)));
     const wrap = h('div.q-card' + (opts.flat ? '' : ''));
     if (opts.meta) wrap.append(opts.meta);
@@ -312,6 +314,12 @@
         return;
       }
       if (answered) return;
+      const correct = reveal(oi);
+      if (opts.onAnswer) opts.onAnswer(correct, oi, q);
+    }
+    // Show an answer and its explanation. Used for a new answer and, through opts.restore, to redisplay a saved one
+    // without calling onAnswer again (so nothing is scored twice).
+    function reveal(oi) {
       answered = true;
       const correct = oi === q.answer;
       $$('.option', list).forEach((x) => {
@@ -333,9 +341,10 @@
       if (q.explain && !correct) box.append(h('div.also', { html: md(q.explain) }));
       if (q.explain && correct && opts.showExplainOnCorrect) box.append(h('div.also', { html: md(q.explain) }));
       fb.append(box);
-      if (!correct && opts.retry) fb.append(h('div.btn-row', { style: { marginTop: '10px' } }, h('button.btn.btn-sm', { type: 'button', onclick: () => { const fresh = mcq(q, Object.assign({}, opts, { seed: BB.seed() })); wrap.replaceWith(fresh); const f = fresh.querySelector('.option'); if (f) f.focus(); } }, icon('reset'), 'Try again')));
-      if (opts.onAnswer) opts.onAnswer(correct, oi, q);
+      if (!correct && opts.retry) fb.append(h('div.btn-row', { style: { marginTop: '10px' } }, h('button.btn.btn-sm', { type: 'button', onclick: () => { const fresh = mcq(q, Object.assign({}, opts, { seed: BB.seed(), restore: null })); wrap.replaceWith(fresh); const f = fresh.querySelector('.option'); if (f) f.focus(); } }, icon('reset'), 'Try again')));
+      return correct;
     }
+    if (mode !== 'select' && opts.restore != null && q.options[opts.restore]) reveal(opts.restore);
     return wrap;
   }
   const stripLead = (s) => String(s || '').replace(/^(Correct|Right|Yes)[.:!,]\s*/i, '');

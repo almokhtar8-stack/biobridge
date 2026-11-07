@@ -61,13 +61,18 @@
   /* Hash router: #/path/parts?query */
   const routes = [];
   function route(pattern, handler) { routes.push({ re: new RegExp('^' + pattern.replace(/:(\w+)/g, '(?<$1>[^/]+)') + '/?$'), handler }); }
-  function currentPath() { const raw = location.hash.replace(/^#/, '') || '/'; const [p, q] = raw.split('?'); return { path: p || '/', query: new URLSearchParams(q || '') }; }
+  // A second # after the route (#/courses#ibm) names a section on that page to scroll to.
+  function currentPath() { const raw = location.hash.replace(/^#/, '') || '/'; const [main, anchor] = raw.split('#'); const [p, q] = main.split('?'); return { path: p || '/', query: new URLSearchParams(q || ''), anchor: anchor || '' }; }
   function go(path, replace) { const url = '#' + path; if (replace) history.replaceState(null, '', url); else if (location.hash !== url) location.hash = url; else dispatch(); if (replace) dispatch(); }
   function dispatch() {
-    const { path, query } = currentPath();
+    const { path, query, anchor } = currentPath();
     for (const r of routes) {
       const m = r.re.exec(path);
-      if (m) { r.handler(Object.assign({}, m.groups || {}), query, path); return; }
+      if (m) {
+        r.handler(Object.assign({}, m.groups || {}), query, path);
+        if (anchor) requestAnimationFrame(() => { const el = document.getElementById(anchor); if (el) el.scrollIntoView({ block: 'start' }); });
+        return;
+      }
     }
     go('/', true);
   }

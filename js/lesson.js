@@ -130,7 +130,7 @@
 
     const footer = h('div',
       h('div.callout', { style: { marginTop: '28px' } }, h('strong', 'Keep it alive'), h('div.btn-row', { style: { marginTop: '8px' } },
-        h('button.btn.btn-sm', { type: 'button', onclick: () => { BB.practice.startTopic({ objective: meta.obj[0], n: 5 }); BB.go('/practice/session'); } }, BB.ui.icon('practice'), 'Practice 5 questions on this'),
+        h('button.btn.btn-sm', { type: 'button', onclick: () => BB.practice.begin(() => BB.practice.startTopic({ objective: meta.obj[0], n: 5 })) }, BB.ui.icon('practice'), 'Practice 5 questions on this'),
         h('button.btn.btn-sm.btn-quiet', { type: 'button', onclick: () => BB.ui.openGlossary() }, BB.ui.icon('glossary'), 'Glossary'))),
       h('nav.lesson-nav', { 'aria-label': 'Previous and next lesson' },
         prev ? h('a.btn', { href: '#/lesson/' + prev }, BB.ui.icon('left'), h('span', h('span.small.muted', 'Previous: '), BB.lessonMeta[prev].title)) : h('span'),
@@ -146,7 +146,8 @@
         entries.forEach((en) => { if (en.isIntersecting) { const k = en.target.dataset.sec; links.forEach((a) => a.classList.toggle('active', a.dataset.go === k)); const act = links.find((a) => a.dataset.go === k); if (act && act.scrollIntoView && stepper.scrollWidth > stepper.clientWidth) stepper.scrollLeft = act.offsetLeft - 16; } });
       }, { rootMargin: '-35% 0px -60% 0px' });
       page.querySelectorAll('.lsec').forEach((s) => io.observe(s));
-      BB.on('mounted', () => io.disconnect());
+      const stop = () => { io.disconnect(); BB.off('mounted', stop); };
+      BB.on('mounted', stop);
     });
     return page;
   }

@@ -19,9 +19,37 @@
     legacy: null
   });
 
+  // Repair saved or imported data whose fields have the wrong type, so a damaged file can never crash the app.
+  const isObj = (x) => !!x && typeof x === 'object' && !Array.isArray(x);
+  function sanitize(input) {
+    const src = isObj(input) ? input : {};
+    const out = Object.assign(blank(), src);
+    for (const k of ['lessons', 'review', 'labs', 'missions', 'traces']) if (!isObj(out[k])) out[k] = {};
+    for (const k of ['attempts', 'sessions']) out[k] = Array.isArray(out[k]) ? out[k].filter(isObj) : [];
+    for (const [id, L] of Object.entries(out.lessons)) if (!isObj(L)) delete out.lessons[id];
+    for (const [k, r] of Object.entries(out.review)) if (!isObj(r) || typeof r.due !== 'number') delete out.review[k];
+    out.settings = Object.assign(blank().settings, isObj(src.settings) ? src.settings : {});
+    if (!isObj(out.settings.courseStatus)) out.settings.courseStatus = {};
+    if (out.diagnostic != null && !(isObj(out.diagnostic) && isObj(out.diagnostic.byObj))) out.diagnostic = null;
+    const okQ = (q) => isObj(q) && Array.isArray(q.options) && q.options.length > 0 && typeof q.answer === 'number';
+    const a = out.activeSession;
+    if (a != null) {
+      if (isObj(a) && Array.isArray(a.items) && a.items.length && a.items.every(okQ) && Array.isArray(a.answers) && a.answers.length === a.items.length) {
+        const n = a.items.length;
+        for (const k of ['unsure', 'flags', 'firstTry', 'seeds']) {
+          if (!Array.isArray(a[k]) || a[k].length !== n) a[k] = a.items.map(() => (k === 'seeds' ? BB.seed() : k === 'firstTry' ? null : false));
+        }
+        a.at = Math.min(Math.max(0, Number.isInteger(a.at) ? a.at : 0), n - 1);
+      } else out.activeSession = null;
+    }
+    if (out.lastResult != null && !(isObj(out.lastResult) && Array.isArray(out.lastResult.items) && out.lastResult.items.every(okQ))) out.lastResult = null;
+    return out;
+  }
+
   let state = blank();
   let available = true;
   let lastError = null;
+  let loadError = null;
 
   function test() {
     try { const k = '__bb_test__'; localStorage.setItem(k, '1'); localStorage.removeItem(k); return true; } catch (e) { return false; }
@@ -53,11 +81,14 @@
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) {
-        const parsed = JSON.parse(raw);
-        state = Object.assign(blank(), parsed);
-        state.settings = Object.assign(blank().settings, parsed.settings || {});
+        state = sanitize(JSON.parse(raw));
       } else state = blank();
-    } catch (e) { state = blank(); lastError = 'Saved progress could not be read and was reset.'; }
+    } catch (e) {
+      // Keep the unreadable text so it is not lost when the fresh state is saved over it.
+      try { localStorage.setItem(KEY + '-unreadable-backup', localStorage.getItem(KEY)); } catch (e2) { /* storage full or blocked */ }
+      state = blank();
+      loadError = lastError = 'Saved progress could not be read and was reset. A copy of the unreadable data was kept in this browser.';
+    }
     if (migrateLegacy(state)) persist();
     return state;
   }
@@ -93,18 +124,18 @@
   function importJSON(text) {
     const parsed = JSON.parse(text);
     const incoming = parsed && parsed.state ? parsed.state : parsed;
-    if (!incoming || typeof incoming !== 'object' || !('lessons' in incoming)) throw new Error('This file does not look like a BioBridge progress export.');
-    state = Object.assign(blank(), incoming);
-    state.settings = Object.assign(blank().settings, incoming.settings || {});
+    if (!isObj(incoming) || !isObj(incoming.lessons)) throw new Error('This file does not look like a BioBridge progress export.');
+    state = sanitize(incoming);
     saveNow();
   }
   function reset() { state = blank(); state.legacy = { skipped: true }; saveNow(); }
 
   BB.store = {
-    load, saveSoon, saveNow, exportJSON, importJSON, reset,
+    load, saveSoon, saveNow, exportJSON, importJSON, reset, sanitize,
     get state() { return state; },
     get available() { return available; },
     get error() { return lastError; },
+    get loadError() { return loadError; },
     lesson(id) { return state.lessons[id] = state.lessons[id] || {}; },
     peekLesson(id) { return state.lessons[id] || {}; }
   };

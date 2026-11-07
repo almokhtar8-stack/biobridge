@@ -245,7 +245,7 @@
         h('div.stat', h('strong', String(bhFalse)), h('span', 'false discoveries after BH'))),
         h('p', { style: { marginTop: '10px' } }, k === 0
           ? `None of these genes truly changed, yet about 5% of tests still gave p < 0.05 by chance. That is what "p < 0.05" allows. The Benjamini-Hochberg (BH) correction asks for stronger evidence when many genes are tested, so false hits mostly disappear.`
-          : `${k} genes truly changed. Raw p < 0.05 finds many of them but also about ${Math.round(0.05 * (m - k))} false ones. BH keeps the proportion of false discoveries among the genes it reports low (at most about 5% on average), at the cost of missing some true changes when replicates are few.`));
+          : `${k} genes truly changed. Raw p < 0.05 finds many of them but also about ${Math.round(0.05 * (m - k))} false ones. BH keeps the proportion of false discoveries among the genes it reports low (at most about 5% on average over many runs), at the cost of missing some true changes when replicates are few. In any single run the share can be higher or lower: press Run the experiment again and watch it change.`));
       markLab('pvalues');
     }
     run();

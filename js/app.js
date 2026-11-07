@@ -41,8 +41,10 @@
     BB.ui.applyTheme();
     BB.ui.buildShell();
     if (!BB.store.available) setTimeout(() => BB.ui.toast('This browser is blocking storage: progress will not be saved. See About to export.', 6000), 400);
-    if (BB.store.error) setTimeout(() => BB.ui.toast(BB.store.error, 6000), 400);
-    BB.on('storage-error', (m) => BB.ui.toast(m, 6000));
+    const bootError = BB.store.loadError || BB.store.error;
+    if (bootError) setTimeout(() => BB.ui.toast(bootError, 8000), 400);
+    let lastStorageToast = 0;
+    BB.on('storage-error', (m) => { if (Date.now() - lastStorageToast > 60000) { lastStorageToast = Date.now(); BB.ui.toast(m, 6000); } });
     BB.on('progress', () => BB.ui.applyNav());
     // The skip link must move focus without changing the hash: "#main" is not a route and would reload the home page.
     const skip = document.querySelector('.skip-link');

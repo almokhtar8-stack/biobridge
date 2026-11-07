@@ -375,7 +375,7 @@ BB.lessons.push({
     "Count the expected chance hits. With m tests of genes that do not change, expect about m x alpha false positives. This site's toy experiment tests 1,512 genes, so even if none of them changed, about 76 would still reach p < 0.05 by chance.",
     "Bonferroni divides alpha by the number of tests (0.05 / 20,000 = 0.0000025). It controls the chance of even one false positive, but it is so strict that many real changes are missed.",
     "Benjamini-Hochberg sorts the p-values from smallest to largest and multiplies each by m / rank: the smallest by m, the second by m / 2, and so on. A final step makes sure the adjusted values never decrease down the sorted list.",
-    "Read padj as a property of the list: calling every gene with padj < 0.05 significant means that, on average, at most about 5 percent of the called genes are false discoveries."
+    "Read padj as a property of the list: calling every gene with padj < 0.05 significant means that, averaged over many repeats of the experiment, at most about 5 percent of the called genes are false discoveries. In any one list the true number is unknown and can be higher or lower."
   ],
   deeper: "Why does BH work? For genes with no real change, p-values are spread evenly between 0 and 1, so if none of the m genes changed, about m x t would fall below any cutoff t. BH compares how many small p-values you actually see with that expectation: a surplus of small p-values signals real effects. The final step works like this: if a gene's value of p x m / rank would be larger than the value of a gene further down the list, it takes that smaller value instead, so adjusted values keep the order of the p-values.",
   show: {
@@ -687,7 +687,7 @@ BB.lessons.push({
       options: [
         { t: "Nothing: the most significant gene is the most important one by definition", why: "Highly expressed genes with consistent changes get tiny p-values whether or not they drive anything." },
         { t: "The gene should be ignored because its p-value is too small to be real", why: "Very small p-values can be perfectly real. The problem is the leap from 'changed' to 'causes'." },
-        { t: "The smallest p-value means the strongest evidence of a change, not the most important or causal gene; it could even be a consequence of the disease", why: "Correct. Significance measures confidence that a change is real, not its role." }
+        { t: "The smallest p-value means the strongest evidence of a change, not the most important or causal gene; it could even be a consequence of the disease", why: "Correct. A small p-value measures the strength of evidence that a change exists, not how important the gene is or what role it plays." }
       ],
       answer: 2
     }

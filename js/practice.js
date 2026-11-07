@@ -130,7 +130,7 @@
   function newSession(mode, items, opts = {}) {
     const seedBase = BB.seed();
     const qs = items.map((it, i) => materialize(it, seedBase + i * 104729)).filter(Boolean);
-    const sess = { id: BB.uid(), mode, label: opts.label || mode, items: qs, at: 0, answers: qs.map(() => null), unsure: qs.map(() => false), flags: qs.map(() => false), firstTry: qs.map(() => null), started: Date.now(), timed: !!opts.timed, endsAt: opts.timed ? Date.now() + opts.minutes * 60000 : null, deferred: !!opts.deferred, seeds: qs.map(() => BB.seed()), finished: false, extra: opts.extra || {} };
+    const sess = { id: BB.uid(), mode, label: opts.label || mode, items: qs, at: 0, answers: qs.map(() => null), unsure: qs.map(() => false), flags: qs.map(() => false), firstTry: qs.map(() => null), started: Date.now(), timed: !!opts.timed, endsAt: null, remainingMs: opts.timed ? opts.minutes * 60000 : null, runningSince: null, deferred: !!opts.deferred, seeds: qs.map(() => BB.seed()), finished: false, extra: opts.extra || {} };
     S().activeSession = sess;
     BB.store.saveNow();
     return sess;
@@ -177,9 +177,11 @@
     return newSession('review', items, { label: `Review: ${items.length} due item${items.length === 1 ? '' : 's'}` });
   }
 
-  function finish(sess) {
+  function finish(sess, opts = {}) {
     if (sess.finished) return;
+    if (sess.timed) { sess.remainingMs = timeLeft(sess); sess.runningSince = null; }
     sess.finished = true;
+    sess.expired = !!opts.expired;
     sess.ended = Date.now();
     const byObj = {};
     let correct = 0, added = 0;
@@ -203,6 +205,48 @@
     S().activeSession = null;
     BB.store.saveNow();
     BB.emit('progress');
+  }
+
+  /* ---------------- clock for timed sessions ----------------
+     Rules: the clock runs only while the session screen is open. Pausing, leaving the screen, hiding the
+     page or closing it stops the clock; resuming continues from the same remaining time. When it reaches
+     zero on screen, the session is submitted once. Only one interval ever runs. */
+  function migrateClock(sess) {
+    if (!sess.timed || sess.remainingMs != null) return;
+    // Sessions saved by 2.1.0 stored an absolute end time; keep whatever time was left.
+    sess.remainingMs = Math.max(0, (sess.endsAt || Date.now()) - Date.now());
+    sess.runningSince = null;
+  }
+  function timeLeft(sess) {
+    if (!sess.timed) return null;
+    migrateClock(sess);
+    return Math.max(0, sess.remainingMs - (sess.runningSince ? Date.now() - sess.runningSince : 0));
+  }
+  function startClock(sess) { migrateClock(sess); if (!sess.runningSince) { sess.runningSince = Date.now(); BB.store.saveSoon(); } }
+  function pauseClock(sess) {
+    if (!sess || !sess.timed || !sess.runningSince) return;
+    sess.remainingMs = timeLeft(sess);
+    sess.runningSince = null;
+    BB.store.saveNow();
+  }
+  const clock = { handle: null, el: null, sess: null };
+  function stopTicking() { if (clock.handle) clearInterval(clock.handle); clock.handle = null; clock.el = null; clock.sess = null; }
+  // A new page replaced the session screen: stop the interval and pause the clock.
+  BB.on('mounted', () => { if (clock.el && !document.body.contains(clock.el)) { const s = clock.sess; stopTicking(); pauseClock(s); } });
+  const onHide = () => { const a = S().activeSession; if (a && a.timed && !a.finished) pauseClock(a); };
+  window.addEventListener('pagehide', onHide);
+  document.addEventListener('visibilitychange', () => {
+    const a = S().activeSession;
+    if (document.visibilityState === 'hidden') onHide();
+    else if (a && clock.sess === a && clock.el && document.body.contains(clock.el)) startClock(a);
+  });
+  // Starting a session from the interface: ask before replacing an unfinished one that has answers.
+  function begin(fn) {
+    const a = S().activeSession;
+    if (a && !a.finished && a.answers.some((x) => x != null) && !confirm(`You have an unfinished session (${a.label}). Starting a new one discards it. Continue?`)) return false;
+    fn();
+    BB.go('/practice/session');
+    return true;
   }
 
   /* ---------------- recommended path ---------------- */
@@ -247,7 +291,7 @@
     const nSel = h('select', { 'aria-label': 'Number of questions' }, [5, 10, 15].map((n) => h('option', { value: String(n), selected: n === 10 }, n + ' questions')));
     const mockN = h('select', { 'aria-label': 'Mock length' }, [20, 40].map((n) => h('option', { value: String(n) }, n + ' questions')));
     const timed = h('input', { type: 'checkbox', checked: true, id: 'mock-timed' });
-    const go = (fn) => () => { fn(); BB.go('/practice/session'); };
+    const go = (fn) => () => begin(fn);
     const total = BB.questions.length, gens = (BB.generators || []).length;
     return h('div',
       h('div.page-head', h('div.eyebrow', 'Placement practice'), h('h1', 'Test your understanding, not your memory'), h('p', `${total} original questions across 4 foundations, plus ${gens} question templates that create fresh variations every time. Levels: beginner, intermediate and application.`)),
@@ -259,7 +303,7 @@
         h('div.card', h('div.eyebrow', 'Topic practice'), h('h3', 'Immediate feedback'), h('p.small.muted', 'Pick a foundation or one learning objective. After each answer you see why it is right or what reasoning went wrong.'),
           h('div.stack', h('div.field', fSel), h('div.field', oSel), h('div.field', nSel)),
           h('div.btn-row', { style: { marginTop: '12px' } }, h('button.btn.btn-primary', { type: 'button', onclick: go(() => startTopic({ foundation: fSel.value || null, objective: oSel.value || null, n: +nSel.value })) }, 'Start practice'), h('button.btn.btn-ghost', { type: 'button', onclick: go(() => startTopic({ weakest: true, n: 10 })) }, weakCount ? `My ${weakCount} weakest areas` : 'Target weak areas'))),
-        h('div.card', h('div.eyebrow', 'Mock assessment'), h('h3', 'Mixed, with a clock'), h('p.small.muted', 'Questions from all four foundations at all three levels, drawn from what the three courses teach. You can move back and forth and flag questions; explanations appear after you submit. About 90 seconds per question when timed.'),
+        h('div.card', h('div.eyebrow', 'Mock assessment'), h('h3', 'Mixed, with a clock'), h('p.small.muted', 'Questions from all four foundations at all three levels, drawn from what the three courses teach. You can move back and forth and flag questions; explanations appear after you submit. About 90 seconds per question when timed; the clock stops whenever you pause or leave the mock.'),
           h('div.stack', h('div.field', mockN), h('label.check-row', timed, 'Timed')),
           h('button.btn.btn-primary', { type: 'button', style: { marginTop: '12px' }, onclick: go(() => startMock({ n: +mockN.value, timed: timed.checked })) }, 'Start mock'))),
       sessionsList(),
@@ -274,7 +318,6 @@
     return h('div.section', h('h2', 'Recent sessions'), h('div.card', h('ul.list-plain', ss.map((s) => h('li.row.between', h('span', h('strong', s.label || s.mode), h('span.small.muted', ' ' + new Date(s.t).toLocaleString())), h('span.chip' + (s.pct >= 80 ? '.green' : s.pct >= 60 ? '.orange' : '.red'), s.pct != null ? s.pct + '%' : ''))))));
   }
 
-  let timerHandle = null;
   function sessionView() {
     const sess = S().activeSession;
     if (!sess) {
@@ -282,18 +325,27 @@
       return last ? resultsView(last) : h('div.empty', 'No active session. ', h('a', { href: '#/practice' }, 'Start one from the practice page.'));
     }
     if (!sess.items.length) { S().activeSession = null; BB.store.saveNow(); return h('div.empty', 'There were no questions for that choice yet. ', h('a', { href: '#/practice' }, 'Choose another topic.')); }
+    stopTicking();
+    if (sess.timed && timeLeft(sess) <= 0) {
+      finish(sess, { expired: true });
+      setTimeout(() => BB.go('/practice/results', true), 0);
+      return h('div.empty', 'Time ran out. Showing your results.');
+    }
     const i = sess.at, q = sess.items[i];
     const wrap = h('div', { style: { maxWidth: '820px', margin: '0 auto' } });
     const top = h('div.quiz-top', h('div', h('div.eyebrow', sess.label), h('strong', `Question ${i + 1} of ${sess.items.length}`)));
     if (sess.timed) {
       const tEl = h('span.timer', { 'aria-live': 'off', role: 'timer' });
       const tick = () => {
-        const s = Math.max(0, Math.round((sess.endsAt - Date.now()) / 1000));
+        if (S().activeSession !== sess || sess.finished) { stopTicking(); return; }
+        const s = Math.ceil(timeLeft(sess) / 1000);
         tEl.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} left`;
         tEl.classList.toggle('low', s < 120);
-        if (s <= 0) { clearInterval(timerHandle); finish(sess); BB.go('/practice/results'); }
+        if (s <= 0) { stopTicking(); finish(sess, { expired: true }); BB.go('/practice/results'); }
       };
-      clearInterval(timerHandle); timerHandle = setInterval(tick, 1000); tick();
+      startClock(sess);
+      clock.el = tEl; clock.sess = sess; clock.handle = setInterval(tick, 1000);
+      tick();
       top.append(tEl);
     }
     wrap.append(top, h('div.meter.thin', { style: { margin: '6px 0 14px' } }, h('span', { style: { width: pct(sess.answers.filter((a) => a != null).length, sess.items.length) + '%' } })));
@@ -301,7 +353,7 @@
     const meta = h('div.q-meta', h('span.level-badge', LEVEL[q.level || 1]), objLabel ? h('span.chip', objLabel) : null, q.gen ? h('span.chip.violet', 'Fresh variation') : null);
     let card;
     if (sess.deferred) {
-      const qx = sess.mode === 'diagnostic' ? Object.assign({}, q, { options: q.options.concat([{ t: "I don't know yet", why: 'Choosing this is honest and useful: it tells BioBridge to include this topic in your path.' }]), noShuffle: false }) : q;
+      const qx = sess.mode === 'diagnostic' ? Object.assign({}, q, { options: q.options.concat([{ t: "I don't know yet", why: 'Choosing this is honest and useful: it tells BioBridge to include this topic in your path.' }]), noShuffle: false, pinLast: true }) : q;
       const idkIndex = qx.options.length - 1;
       card = BB.ui.mcq(qx, { mode: 'select', meta, seed: sess.seeds[i], selected: sess.mode === 'diagnostic' && sess.unsure[i] ? idkIndex : sess.answers[i], onAnswer: (_, oi) => {
         if (sess.mode === 'diagnostic' && oi === idkIndex) { sess.answers[i] = -1; sess.unsure[i] = true; } else { sess.answers[i] = oi; sess.unsure[i] = false; }
@@ -309,15 +361,22 @@
       } });
     } else {
       const answered = sess.answers[i] != null;
-      card = BB.ui.mcq(q, { meta, seed: sess.seeds[i], showExplainOnCorrect: true, onAnswer: (ok, oi) => {
+      const revisit = (ok) => {
+        const L = q.lesson && BB.lessonMeta[q.lesson];
+        if (!ok && L) card.append(h('div.btn-row', { style: { marginTop: '10px' } }, h('a.btn.btn-sm.btn-ghost', { href: '#/lesson/' + q.lesson, target: '_self' }, BB.ui.icon('learn'), 'Revisit: ' + L.title), h('span.small.muted', 'Added to your review queue.')));
+      };
+      // A saved answer is redisplayed with restore, which never calls onAnswer, so revisiting, redrawing or
+      // reloading cannot score it again. firstTry guards the one recorded attempt per question per session.
+      card = BB.ui.mcq(q, { meta, seed: sess.seeds[i], showExplainOnCorrect: true, restore: answered ? sess.answers[i] : null, onAnswer: (ok, oi) => {
+        if (sess.answers[i] != null || sess.firstTry[i] != null) return;
         sess.answers[i] = oi;
+        sess.firstTry[i] = ok ? 1 : 0;
         record(q, ok, sess.mode);
         schedule(q, ok);
         BB.store.saveSoon(); navBtns();
-        const L = q.lesson && BB.lessonMeta[q.lesson];
-        if (!ok && L) card.append(h('div.btn-row', { style: { marginTop: '10px' } }, h('a.btn.btn-sm.btn-ghost', { href: '#/lesson/' + q.lesson, target: '_self' }, BB.ui.icon('learn'), 'Revisit: ' + L.title), h('span.small.muted', 'Added to your review queue.')));
+        revisit(ok);
       } });
-      if (answered) setTimeout(() => { const b = card.querySelector(`.option[data-i="${sess.answers[i]}"]`); if (b) b.click(); }, 0);
+      if (answered) revisit(sess.answers[i] === q.answer);
     }
     wrap.append(card);
     const navRow = h('div.btn-row', { style: { marginTop: '16px', justifyContent: 'space-between' } });
@@ -331,11 +390,11 @@
         if (isLast) {
           const unanswered = sess.answers.filter((a) => a == null).length;
           if (sess.deferred && unanswered && !confirm(`${unanswered} question${unanswered === 1 ? ' is' : 's are'} unanswered. Submit anyway?`)) return;
-          clearInterval(timerHandle); finish(sess); BB.go('/practice/results');
+          stopTicking(); finish(sess); BB.go('/practice/results');
         } else { sess.at++; BB.store.saveSoon(); BB.dispatch(); }
       } }, isLast ? (sess.deferred ? 'Submit and see results' : 'Finish') : 'Next', isLast ? null : BB.ui.icon('right'));
       const left = h('div.btn-row', sess.deferred ? prev : null, sess.mode === 'mock' ? h('button.btn' + (sess.flags[i] ? '.btn-ghost' : ''), { type: 'button', 'aria-pressed': String(sess.flags[i]), onclick: () => { sess.flags[i] = !sess.flags[i]; BB.store.saveSoon(); navBtns(); grid(); } }, BB.ui.icon('flag'), sess.flags[i] ? 'Flagged' : 'Flag') : null);
-      navRow.append(left, h('div.btn-row', h('button.btn.btn-quiet', { type: 'button', onclick: () => { if (confirm('Leave this session? Your answers so far are kept and you can resume from the practice page.')) BB.go('/practice'); } }, 'Pause'), next));
+      navRow.append(left, h('div.btn-row', h('button.btn.btn-quiet', { type: 'button', onclick: () => { if (confirm(sess.timed ? 'Pause this session? The clock stops, your answers are kept, and you can resume from the practice page.' : 'Leave this session? Your answers so far are kept and you can resume from the practice page.')) { stopTicking(); pauseClock(sess); BB.go('/practice'); } } }, 'Pause'), next));
     }
     navBtns();
     const gridEl = h('div');
@@ -355,6 +414,7 @@
     const p = pct(r.correct, r.total);
     const wrap = h('div', { style: { maxWidth: '900px', margin: '0 auto' } });
     const isDiag = sess.mode === 'diagnostic';
+    if (sess.expired) wrap.append(h('div.callout.warn', { style: { marginBottom: '12px' } }, h('strong', 'Time ran out. '), 'Your answers were submitted automatically; unanswered questions count as incorrect.'));
     wrap.append(h('div.score-hero', h('div.eyebrow', { style: { color: '#9be6d2' } }, isDiag ? 'Diagnostic complete' : sess.mode === 'mock' ? 'Mock assessment complete' : 'Session complete'),
       h('div.big', p + '%'), h('p', `${r.correct} of ${r.total} correct` + (r.secs ? ` in ${Math.floor(r.secs / 60)} min ${r.secs % 60} s` : '') + (isDiag && sess.unsure ? `. You chose "I don't know yet" ${sess.unsure.filter(Boolean).length} times.` : '.')),
       h('p', isDiag ? 'This is a starting point, not a grade. Your learning path below puts the lessons you need first.' : p >= 80 ? 'Strong on these questions. Keep testing yourself on fresh variations; strong practice scores are evidence, not proof, of mastery.' : p >= 60 ? 'A solid base. Work on the objectives below that are in red or orange, then practice them again.' : 'Rebuild the foundations first: the explanations below and the linked lessons will help more than retaking straight away.')));
@@ -417,7 +477,7 @@
     for (const [, v] of all) for (const o of v.obj || []) byObj[o] = (byObj[o] || 0) + 1;
     return h('div',
       h('div.page-head', h('div.eyebrow', 'Spaced review'), h('h1', due.length ? `${due.length} item${due.length === 1 ? '' : 's'} ready for review` : 'Nothing due right now'), h('p', 'Missed questions and the checkpoint questions of lessons you finished come back after 1 day, then 2, 4, 8 and 16 days each time you get them right. A miss sends an item back to the start. Question templates come back as a fresh variation, so you practice the idea, not the wording.')),
-      h('div.btn-row', h('button.btn.btn-primary', { type: 'button', disabled: !due.length, onclick: () => { startReview(); BB.go('/practice/session'); } }, BB.ui.icon('review'), due.length ? `Start review (${Math.min(15, due.length)} items)` : 'Start review'), h('a.btn', { href: '#/practice' }, 'Practice something new')),
+      h('div.btn-row', h('button.btn.btn-primary', { type: 'button', disabled: !due.length, onclick: () => begin(startReview) }, BB.ui.icon('review'), due.length ? `Start review (${Math.min(15, due.length)} items)` : 'Start review'), h('a.btn', { href: '#/practice' }, 'Practice something new')),
       h('div.grid-2', { style: { marginTop: '18px' } },
         h('div.card', h('h3', 'Coming up'), Object.keys(upcoming).length ? h('ul.list-plain', Object.entries(upcoming).sort((a, b) => a[0] - b[0]).map(([d, n]) => h('li.row.between', h('span', d === '1' ? 'Tomorrow' : `In ${d} days`), h('strong', String(n))))) : h('p.muted', 'Nothing scheduled in the next week.'), h('p.small.muted', `${all.length} item${all.length === 1 ? '' : 's'} in your queue in total.`)),
         h('div.card', h('h3', 'What is in your queue'), Object.keys(byObj).length ? h('ul.list-plain', Object.entries(byObj).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([o, n]) => h('li.row.between', h('span.small', (BB.objectives[o] || {}).label || o), h('span.chip', String(n))))) : h('p.muted', 'Finish a lesson or a practice session to fill your queue.'))));
@@ -453,5 +513,5 @@
     return wrap;
   }
 
-  BB.practice = { objectiveStats, record, schedule, addLessonToReview, dueCount, dueKeys, startDiagnostic, startTopic, startMock, startReview, finish, recommendedPath, hub, sessionView, resultsView, reviewView, progressView, lessonRow, STATUS, FOUND, LEVEL, lessonsForObj, pool };
+  BB.practice = { objectiveStats, record, schedule, addLessonToReview, dueCount, dueKeys, startDiagnostic, startTopic, startMock, startReview, finish, begin, timeLeft, recommendedPath, hub, sessionView, resultsView, reviewView, progressView, lessonRow, STATUS, FOUND, LEVEL, lessonsForObj, pool };
 })();

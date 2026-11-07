@@ -441,7 +441,7 @@ BB.lessons.push({
     code: "question     Which genes respond to heat?\nsamples      6 cultures: 3 at 37 C, 3 at 42 C\nreads        FASTQ files, millions of reads per sample\ncounts       one row per gene, one column per sample\nstatistics   normalize, compare, correct for many tests\nresult       HSPA1A: log2 fold change +5.27, adjusted p = 0.0035\nmeaning      heat switches on protein-folding helpers (chaperones)",
     notes: [
       "A log2 fold change of +5.27 means about 38 times more RNA after heat shock, because 2 to the power 5.27 is about 38.",
-      "The adjusted p-value says a difference this large would be very unlikely from noise alone, even after accounting for the many genes tested. Foundation 3 explains both numbers.",
+      "A small adjusted p-value means the evidence for a change stays strong even after accounting for the thousands of genes tested at once. It measures evidence; it is not the probability that the gene really changed. Foundation 3 explains both numbers.",
       "The last line is biology, not statistics: it connects the numbers to what heat does to proteins."
     ]
   },

@@ -1,5 +1,31 @@
 # Changelog
 
+## 2.1.1 (7 November 2026)
+
+A correctness release. The navy and gold design is unchanged, and saved progress from 2.0 and 2.1.0 keeps working. Details, reproductions and root causes are in `docs/RELEASE-2.1.1.md`.
+
+### Fixed
+
+- **Duplicate scoring in topic practice and review.** Returning to an answered question (redraw, reload or Resume) replayed a click, recording another attempt and moving its review item again; enough redraws could drop an item from the review queue. Saved answers are now redisplayed without being scored, and each question records at most one attempt per session.
+- **Timed mocks kept running after you left.** The clock ran on in the background and could submit the mock and jump to the results page while you were reading a lesson. The clock now runs only while the mock is on screen: Pause, leaving the page, hiding the tab or closing it stops it, and Resume continues from the same time. A reload never resets it, only one clock can run, and a mock whose time runs out is submitted once, with a note on the results page.
+- **Starting a new session silently discarded an unfinished one.** You are now asked first when the unfinished session has answers.
+- **Damaged saved data could break the app.** Saved and imported progress is now checked field by field and repaired; unreadable saved data is reset with a visible message and kept as a backup instead of being overwritten.
+- **The storage warning could disappear before it was shown,** and a full storage area could show the same warning repeatedly. The message is now captured at start-up and repeated at most once a minute.
+- **Links to a section of a page did not work.** The three course cards on the home page (`#/courses#kaust` and similar) sent you back to the home page. The router now opens the page and scrolls to the section.
+- **"I don't know yet" moved around in the diagnostic.** It is now always the last option.
+- **Lesson pages left an event listener behind on every visit.** It is now removed when you leave.
+
+### Changed (scientific content)
+
+- Question st-034 was rewritten. It now separates the false discovery rate (an average over repeated experiments) from the unknown number of false discoveries in one list, and adds a distractor for the common misreading of an adjusted p-value as the probability that a gene changed.
+- st-021 and st-033 no longer describe a p-value as "probably real" or say that FDR control tells you which genes are false; st-021 now uses an adjusted p-value, as a genome-wide study would.
+- Glossary entries for multiple testing, false positive, false discovery rate and adjusted p-value were rewritten for the same distinctions, including that an adjusted p-value is not the probability that a gene is a false positive.
+- The multiple-testing lesson, the Foundation 0 discovery lesson, an interpretation check and the multiple-testing lab now say that FDR is an average over many experiments and that a single list can contain more or fewer false discoveries.
+
+### Added
+
+- `tools/test_sessions.py`: 44 browser checks for scoring, resuming, timers, storage repair, import and in-site links.
+
 ## 2.1.0 (7 November 2026)
 
 ### Changed

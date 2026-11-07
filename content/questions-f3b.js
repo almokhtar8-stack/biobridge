@@ -264,10 +264,10 @@ BB.questions.push(
   },
   {
     id: "st-021", obj: ["ST.TEST"], lesson: "f3-tests", level: 3,
-    q: "An RNA-seq study with 50 samples per group finds a gene with log2FC = 0.05 and p = 0.0001. Which interpretation is best?",
+    q: "An RNA-seq study with 50 samples per group finds a gene with log2FC = 0.05 and an adjusted p-value of 0.0001. Which interpretation is best?",
     options: [
-      { t: "The change is probably real but tiny (about 3.5 percent), so it may not matter biologically", why: "Correct. 2 to the power 0.05 is about 1.035. With 50 samples per group, even tiny changes can reach small p-values." },
-      { t: "This is a large, important change, because the p-value is very small", why: "A small p-value shows confidence that some change exists, not that it is large. Effect size and significance are different things." },
+      { t: "There is strong evidence of a change, but the change is tiny (about 3.5 percent), so it may not matter biologically", why: "Correct. 2 to the power 0.05 is about 1.035. With 50 samples per group, even tiny changes can reach very small adjusted p-values. Statistical significance is not biological importance." },
+      { t: "This is a large, important change, because the p-value is very small", why: "A small p-value is strong evidence that some change exists; it does not measure how large the change is. Effect size and significance are different things." },
       { t: "The result must be a false positive, because the change is so small", why: "Small effects can be perfectly real. With many replicates, a test has enough power to detect them." }
     ],
     answer: 0,
@@ -416,24 +416,24 @@ BB.questions.push(
     id: "st-033", obj: ["ST.MULTI"], lesson: "f3-multiple", level: 3,
     q: "In this site's toy experiment, 1,512 genes were tested and 191 had p < 0.05. What is the best interpretation?",
     options: [
-      { t: "None of the genes really changed, because about 76 false positives are expected", why: "191 is far more than 76, which points to real changes. The job is telling which ones, and that is what FDR control does." },
+      { t: "None of the genes really changed, because about 76 false positives are expected", why: "191 is far more than the 76 expected if nothing had changed, which points to real changes. Raw p-values cannot show which genes they are; adjusted p-values give a list in which false discoveries are kept rare on average." },
       { t: "About 76 genes would pass by chance even if nothing changed, so there is real signal, but many of the 191 could be false positives; use adjusted p-values", why: "Correct. 191 is well above the 76 expected by chance, but raw p-values cannot tell you which genes are the real ones." },
-      { t: "All 191 genes respond to heat", why: "About 76 genes would reach p < 0.05 by chance alone, so many of the 191 are probably not real responders." }
+      { t: "All 191 genes respond to heat", why: "If no gene had changed, about 76 would still reach p < 0.05 by chance, so the 191 can include many chance hits. p < 0.05 alone cannot show that all of them respond." }
     ],
     answer: 1,
     explain: "1,512 x 0.05 is about 76 expected chance hits. Seeing 191 suggests real effects, but you cannot tell from raw p-values which genes are real. BH adjustment keeps 18 genes at padj < 0.05."
   },
   {
     id: "st-034", obj: ["ST.MULTI"], lesson: "f3-multiple", level: 3,
-    q: "A study reports 200 genes as significant at an FDR of 5 percent (padj < 0.05). About how many of them are expected to be false discoveries?",
+    q: "A study uses the Benjamini-Hochberg method and reports 200 genes with an adjusted p-value below 0.05. Which statement about false discoveries in this list is correct?",
     options: [
-      { t: "About 10 or fewer, on average", why: "Correct. FDR control at 5 percent keeps the expected proportion of false discoveries at or below 5 percent: 5 percent of 200 is 10." },
-      { t: "None, because they passed the FDR cutoff", why: "FDR control does not remove false positives; it limits their expected proportion. Some of the 200 are probably false." },
-      { t: "About 190", why: "This reverses the meaning. FDR 5 percent means about 5 percent false, so about 95 percent are expected to be true." },
-      { t: "Exactly 10", why: "The FDR is an expected proportion, an average over many experiments, not an exact count for one list." }
+      { t: "Averaged over many experiments, lists made this way contain at most about 5 percent false discoveries, so about 10 or fewer is a rough expectation, but the actual number in this list is unknown", why: "Correct. FDR control is a promise about the method on average: across many repeats, false discoveries make up at most about 5 percent of the reported lists. For this one list nobody knows the exact count, which could be below or above 10." },
+      { t: "Exactly 10 of the 200 genes are false discoveries", why: "5 percent of 200 is 10, but FDR is an average over many experiments, not a count for one list. The number of false discoveries in this list is unknown." },
+      { t: "None of the 200 genes is a false discovery, because they all passed the cutoff", why: "Passing an FDR cutoff does not prove that a gene changed. The method makes false discoveries rare on average; it does not remove them." },
+      { t: "Each of the 200 genes has at least a 95 percent probability of being truly changed", why: "An adjusted p-value is not the probability that a gene changed. FDR describes how lists behave on average, not each gene: a gene just under the cutoff is less certain than one far below it." }
     ],
     answer: 0,
-    explain: "FDR is the expected value of (false discoveries / all discoveries). At 5 percent, a list of 200 is expected to contain at most about 10 false discoveries. You do not know which ones, which is why key genes are validated."
+    explain: "With BH at 5 percent, the expected share of false discoveries in the reported list, averaged over repeated experiments, is at most 5 percent. About 10 of 200 is a rough guide to what to expect, not a count for this list: you do not know how many are false or which ones, so key genes are confirmed in independent experiments."
   },
   {
     id: "st-035", obj: ["ST.MULTI"], lesson: "f3-multiple", level: 3,

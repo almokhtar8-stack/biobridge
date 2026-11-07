@@ -1,6 +1,34 @@
-# BioBridge 2.0 testing and limitations report
+# BioBridge testing and limitations report
 
-Version 2.0.0, tested 7 November 2026. Version 2.1.0 (the navy and gold restyle) was re-tested with the full browser suite, the accessibility audit in both themes and the phone layout checks below; all pass. Every number below comes from the last full run of the test suites in `tools/`. The commands are listed in `README.md`.
+## Version 2.1.1 (7 November 2026)
+
+Every suite below was run on the `release/2.1.1` branch in this environment, served over http. Logs from these runs are kept outside the site; the numbers are copied from their last lines.
+
+| Suite | Command | Result |
+| --- | --- | --- |
+| Content structure | `node tools/validate.mjs` | No errors (60 lessons, 310 questions, 273 glossary terms) |
+| Code shown to learners, by execution | `python3 tools/verify_code.py` | 198 of 198 match (Python 3.13, R 4.3.3, Bash 5.2) |
+| Simulated terminal against real Bash | `node tools/test_shell.mjs` | 190 of 190 identical |
+| Terminal missions | `node tools/test_missions.mjs` | 78 of 78 steps pass |
+| Question generators | `node tools/test_generators.mjs 30` | 750 variants, 390 executed checks, 0 problems |
+| Statistics against SciPy | `node tools/test_stats.mjs` | All match |
+| Browser: every route, main flows, accessibility | `python3 tools/test_e2e.py --axe ...` | 41 of 41; 97, 97 and 127 routes at phone, tablet and desktop sizes with no JavaScript errors; axe-core: 0 violations in light and dark themes |
+| Browser: sessions, timers, storage, links (new) | `python3 tools/test_sessions.py` | 44 of 44 |
+| Phone layout (25 pages at 320, 360, 390 px and landscape) | audit script used during development, not shipped | No horizontal overflow; no text field under 16 px |
+
+New regression checks in `tools/test_sessions.py` and what they cover:
+
+- **Duplicate scoring:** answering, redrawing three times, reloading and resuming leaves exactly one attempt per question and an unchanged review queue; a review item moves up exactly one box; a mock records exactly one attempt per question on submission and nothing when the results are viewed again.
+- **Restoring answers:** a resumed topic question shows its saved answer and explanation and cannot be answered again; mock answers survive Previous, the question grid and a reload.
+- **Timers (with a controlled clock):** a 20-question mock starts at 30:00 and counts down on screen; leaving for 40 minutes neither redirects nor submits; Resume continues from the same time; Pause stops the clock; a reload does not reset it; five redraws still give exactly one running clock; running out on screen submits once, shows the results and says that time ran out; a 2.1.0 session that ran out while away is submitted when opened.
+- **Session replacement:** starting a new session asks before discarding an unfinished one with answers.
+- **Storage:** damaged saved data is repaired and the app keeps working; unreadable data resets with a message and is kept as a backup; a non-BioBridge file is refused without changes; export then import returns the same progress; damaged fields in an imported file are repaired.
+- **Diagnostic:** "I don't know yet" is always the last option.
+- **Links:** every in-site link on every main page and lesson (100 links) opens a real page or section.
+
+Not tested in 2.1.1: real phones and tablets, Safari, Firefox, screen readers, and the live GitHub Pages site (this environment cannot reach github.io). The deployed site was not changed: it still serves 2.1.0 until the release branch is merged and published.
+
+## Earlier report (2.0.0 and 2.1.0)
 
 ## Results at a glance
 
