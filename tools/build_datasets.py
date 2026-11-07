@@ -196,17 +196,40 @@ annotation_tsv = "symbol\tchromosome\tcategory\tdescription\n" + "".join(
 
 readme = """Heat-shock RNA-seq practice project
 ===================================
-Question: which genes change when human cells are heated from 37 C to 42 C for one hour?
+Question: which genes change when human cells are heated from 37 C to
+42 C for one hour?
 
-data/counts.tsv      reads assigned to 12 genes in 6 samples (tab-separated)
+This folder is a tiny practice version of a real RNA-seq project.
+All numbers are simulated for teaching. The gene names and the
+direction of the heat-shock response are real biology.
+
+What is inside
+--------------
+data/counts.tsv      reads assigned to 12 genes in 6 samples
 data/samples.tsv     which condition each sample belongs to
 data/annotation.tsv  chromosome and category for each gene
 data/sequences.fa    six short toy DNA sequences (FASTA)
 data/reads.fastq     eight short toy sequencing reads (FASTQ)
-scripts/             small shell scripts
+scripts/             two small shell scripts
 results/             put your output files here
 
-All numbers are simulated for teaching.
+The .tsv files are tables with columns separated by tabs. Open them
+in a terminal, in R (read.delim), in Python (pandas) or in a
+spreadsheet program.
+
+scripts/count_seqs.sh is not executable yet, on purpose: practice
+making it runnable with  chmod +x scripts/count_seqs.sh
+
+First commands to try (from inside this folder)
+-----------------------------------------------
+ls data
+head -3 data/counts.tsv
+grep -c ">" data/sequences.fa
+bash scripts/count_seqs.sh data/sequences.fa
+
+The BioBridge website has the same files in its browser terminal, in
+the folder ~/project. Its Practice files page lists tested commands
+with the output you should see, plus help for common problems.
 """
 notes = """Welcome to the BioBridge practice server.
 Your project files are in the folder called project.

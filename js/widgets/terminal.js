@@ -61,9 +61,12 @@
         h('p.small', { html: md(mission.intro) }),
         h('div.split', term, h('div', missionPanel, warnBox)));
     } else {
-      wrap.append(h('div.widget-head', h('div', h('div.eyebrow', 'Free practice'), h('h3', 'Explore the practice project')), h('span.sim-label', 'Simulation')),
+      // props.tries and props.task let a Companion topic suggest its own commands.
+      const tries = props.tries || ['ls', 'cd project', 'cd data', 'head -3 counts.tsv', 'grep HSP counts.tsv', 'wc -l *.tsv', 'help'];
+      wrap.append(h('div.widget-head', h('div', h('div.eyebrow', props.eyebrow || 'Free practice'), h('h3', props.title || 'Explore the practice project')), h('span.sim-label', 'Simulation')),
+        props.task ? h('p.small', { html: md(props.task) }) : null,
         term, warnBox,
-        h('p.widget-note', 'Try: ', ['ls', 'cd project', 'cd data', 'head -3 counts.tsv', 'grep HSP counts.tsv', 'wc -l *.tsv', 'help'].map((c) => h('button.btn.btn-sm.btn-quiet', { type: 'button', onclick: () => { input.value = c; input.focus(); } }, c))));
+        h('p.widget-note', props.tries ? 'Tap a command to put it in the terminal, then press Run: ' : 'Try: ', tries.map((c) => h('button.btn.btn-sm.btn-quiet.term-try', { type: 'button', onclick: () => { input.value = c; input.focus(); } }, c))));
     }
     wrap.append(h('p.widget-note', 'This is a teaching simulation of a Linux shell running on pretend files. It supports a defined set of commands (type help), formats output like GNU tools, and resets to the original files with Reset. It is not a full Bash environment.'));
 

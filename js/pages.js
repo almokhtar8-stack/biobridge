@@ -1,4 +1,4 @@
-/* Pages: home, learn, course companion, labs, glossary, notebook, study plan, about. */
+/* Pages: explore deeply (the 2.1 dashboard), learn, course map, labs, glossary, notebook, study plan, about. */
 (function () {
   'use strict';
   const BB = window.BB;
@@ -29,7 +29,7 @@
   }
 
 
-  function home() {
+  function explore() {
     const st = S();
     const total = Object.keys(BB.lessonMeta).length, done = BB.lessonsDone();
     const days = BB.daysLeft();
@@ -39,16 +39,14 @@
     const cont = path.find((x) => !x.optional) || path[0];
     const SEQ = [['What is it?', 'A plain definition first.'], ['Why does it exist?', 'The problem it solves.'], ['How does it work?', 'Step by step.'], ['Show me', 'A worked example with real output.'], ['Let me try', 'A lab, terminal or code activity.'], ['Test my understanding', 'Feedback that explains mistakes.'], ['Connect it', 'Where it matters in real science.']];
     return h('div',
-      h('section.hero',
-        h('div.confetti', { 'aria-hidden': 'true' }, Array.from({ length: 12 }, () => h('span'))),
-        h('div.hero-inner',
-          h('h1', 'Your ', h('span.hl', 'bridge'), ' into bioinformatics'),
-          h('p.hero-lead', 'You do not need a background. You need the why. Learn biology, Linux, Python, R and statistics from absolute zero, see how each tool supports real discoveries, and prepare for the KAUST Academy placement assessment with original practice questions.'),
-          h('div.btn-row',
-            fresh ? h('button.btn.btn-primary', { type: 'button', onclick: () => BB.practice.begin(BB.practice.startDiagnostic) }, 'Find my starting point (15 min)') : cont ? h('a.btn.btn-primary', { href: '#/lesson/' + cont.id }, 'Continue: ' + BB.lessonMeta[cont.id].title) : h('a.btn.btn-primary', { href: '#/practice' }, 'Go to practice'),
-            h('a.btn.btn-ghost', { href: '#/lesson/f0-bioinformatics' }, fresh ? 'Start from absolute zero' : 'Browse all lessons')),
-          h('p.hero-note', 'Independent study companion. Not an official KAUST, KAUST Academy or Coursera site.'))),
-      h('div.stats.lifted',
+      h('div.page-head.explore-head',
+        h('div.eyebrow', 'Explore deeply (optional)'),
+        h('h1', 'The full path, whenever you want more'),
+        h('p', `Everything from BioBridge 2.1 is here: ${total} lessons from absolute zero, ${LABS.length} interactive labs, placement practice and a review queue. None of it is required. For a quick answer about a lecture, use the Companion.`),
+        h('div.btn-row.center-row',
+          fresh ? h('button.btn.btn-primary', { type: 'button', onclick: () => BB.practice.begin(BB.practice.startDiagnostic) }, 'Find my starting point (15 min)') : cont ? h('a.btn.btn-primary', { href: '#/lesson/' + cont.id }, 'Continue: ' + BB.lessonMeta[cont.id].title) : h('a.btn.btn-primary', { href: '#/practice' }, 'Go to practice'),
+          h('a.btn.btn-ghost', { href: '#/' }, 'Back to the Companion'))),
+      h('div.stats',
         h('div.stat', h('strong', days ? `${days} day${days === 1 ? '' : 's'}` : 'Deadline passed'), h('span', `until ${BB.config.deadlineLabel} (your cohort's course deadline)`)),
         h('div.stat', h('strong', `${done} / ${total}`), h('span', 'lessons explained in your own words')),
         h('div.stat', h('strong', String(BB.practice.dueCount())), h('span', 'review items due')),
@@ -69,7 +67,7 @@
       h('div.section-head.center', h('div.eyebrow', 'Why it matters'), h('h2', 'How a basic skill becomes a discovery'), h('p', 'Real question: what do human cells switch on when they overheat?')),
       h('div.grid-4', [['Biology', 'Ask what changed', 'Heat can switch genes on.', 'f0-expression'], ['Linux', 'Handle the reads', 'Millions of reads live in files on a server.', 'f1-bio-recipes'], ['Python and R', 'Build the table', 'Count reads per gene, compare samples fairly.', 'f3-counts'], ['Statistics', 'Find real changes', 'Separate signal from noise across 20,000 genes.', 'f3-de']].map(([e, t, d, id]) => h('a.card.card-link', { href: '#/lesson/' + id }, h('div.eyebrow', e), h('h3', t), h('p.small.muted', d)))),
       h('div.callout.info', { style: { marginTop: '12px' } }, h('strong', 'Where the courses fit: '), 'Linux handles files and workflows, Python organizes and processes data, R tests patterns and draws plots, and statistics decides what you can trust. Together they turn a biological question into a testable hypothesis, not an automatic answer.'),
-      h('div.section-head.center', h('div.eyebrow', 'Course companion'), h('h2', 'Built around your three Coursera courses'), h('p', 'The course companion maps every module to the lessons that support it.')),
+      h('div.section-head.center', h('div.eyebrow', 'Course map'), h('h2', 'Lessons for each Coursera module'), h('p', 'The course map lists, module by module, the BioBridge lessons that go deeper than the Companion topics.')),
       h('div.grid-3', Object.entries(BB.courses).map(([k, c]) => h('a.card.card-link', { href: '#/courses#' + k }, h('div.eyebrow', c.org), h('h3', c.name), h('p.small.muted', `${c.modules.length} modules`)))),
       h('p.footer-note', 'BioBridge is an independent learning companion. It is not affiliated with, endorsed by or run by KAUST, KAUST Academy, Coursera, Rice University or IBM. The 5 December 2026 date comes from your cohort information; always confirm deadlines and requirements in your official invitation. Practice questions are original and are not official assessment questions.'));
   }
@@ -115,7 +113,8 @@
       ibm: 'Foundation 1 follows this course module by module, using a simulated terminal with biological files. The final project (a scheduled backup script) is graded by peers, so BioBridge teaches the underlying skills without giving a solution.'
     };
     return h('div',
-      h('div.page-head', h('div.eyebrow', 'Course companion'), h('h1', 'Follow your Coursera courses, fill the gaps'), h('p', 'Pick the module you are working on and open the lessons that explain it from zero. Module titles and summaries come from the public course pages (checked 7 November 2026). BioBridge does not replace the courses or their graded work.')),
+      h('div.page-head', h('div.eyebrow', 'Course map'), h('h1', 'Lessons for each Coursera module'), h('p', 'Pick the module you are working on and open the full lessons that explain it from zero. Module titles and summaries come from the public course pages (checked 8 November 2026). BioBridge does not replace the courses or their graded work.')),
+      h('div.callout.accent', h('strong', 'Looking for one lecture topic?'), 'The Companion has a 2 to 4 minute page for each important lecture topic: ', Object.entries(BB.courses).map(([k, c], i) => [i ? ', ' : '', h('a', { href: '#/c/' + k }, c.short)]), '.'),
       h('div.callout.warn', 'Complete the official Coursera courses and their assessments; that is what counts for the program. Check the official KAUST Academy program page and your invitation for the current requirements: ', h('a', { href: BB.academyUrl, target: '_blank', rel: 'noopener noreferrer' }, 'KAUST Academy Bioinformatics program')),
       Object.entries(BB.courses).map(([key, c]) => h('section.section', { id: key },
         h('div.card',
@@ -251,7 +250,7 @@
     drawPace();
     const stages = [
       ['1', 'Foundations from zero', 'Foundation 0 gives you the biology and computing words everything else uses. If the diagnostic shows you know it, skim it.', 'f0'],
-      ['2', 'Work through your Coursera courses with the companion', 'For each module you study, open the matching BioBridge lessons in the course companion. Complete the official course work first: that is what counts.', null],
+      ['2', 'Work through your Coursera courses with the Companion', 'When a lecture is unclear, open its 2 to 4 minute Companion topic; for more depth, the course map lists the full lessons for each module. Complete the official course work first: that is what counts.', null],
       ['3', 'Practice, review, explain', 'Each study session: clear the review queue, do one lesson including its teach-back, then five practice questions on your weakest objective.', null],
       ['4', 'Mock assessments and final checks', 'Take timed mocks on fresh questions, study every explanation, and confirm on Coursera that each required course shows as complete before the deadline.', null]
     ];
@@ -280,9 +279,9 @@
     });
     const counts = { lessons: BB.lessons.length, questions: BB.questions.length, gens: (BB.generators || []).length, glossary: (BB.glossary || []).length, missions: Object.keys(BB.missions).length, traces: Object.keys(BB.pyPrograms).length };
     return h('div', { style: { maxWidth: '860px' } },
-      h('div.page-head', h('div.eyebrow', 'About, data and help'), h('h1', 'About BioBridge'), h('p', 'An independent, beginner-first companion for the foundations of bioinformatics, built for students preparing for the KAUST Academy Bioinformatics Program through three Coursera courses.')),
+      h('div.page-head', h('div.eyebrow', 'About, data and help'), h('h1', 'About BioBridge'), h('p', 'An independent, beginner-first companion for the three Coursera courses that students of the KAUST Academy Bioinformatics Program take first: quick, lecture-aligned explanations by default, and a full path from zero when you want more.')),
       h('div.callout.warn', h('strong', 'Independent and unofficial'), 'BioBridge is not affiliated with, endorsed by or run by KAUST, KAUST Academy, Coursera, Rice University or IBM. It does not give official course credit. Its practice questions are original; they are not KAUST Academy questions and do not describe the real placement test.'),
-      h('div.section', h('h2', 'What is inside'), h('div.stats', h('div.stat', h('strong', String(counts.lessons)), h('span', 'lessons')), h('div.stat', h('strong', String(counts.questions)), h('span', 'practice questions')), h('div.stat', h('strong', String(counts.gens)), h('span', 'question templates')), h('div.stat', h('strong', String(counts.glossary)), h('span', 'glossary terms'))),
+      h('div.section', h('h2', 'What is inside'), h('div.stats', h('div.stat', h('strong', String((BB.companion || []).length)), h('span', 'Companion topics')), h('div.stat', h('strong', String(BB.diagram ? BB.diagram.names().length : 0)), h('span', 'visual explanations')), h('div.stat', h('strong', String(counts.lessons)), h('span', 'lessons')), h('div.stat', h('strong', String(counts.questions)), h('span', 'practice questions')), h('div.stat', h('strong', String(counts.gens)), h('span', 'question templates')), h('div.stat', h('strong', String(counts.glossary)), h('span', 'glossary terms'))),
         h('p.small.muted', { style: { marginTop: '8px' } }, `Plus ${counts.missions} terminal missions, ${counts.traces} recorded Python traces and ${LABS.length} interactive labs.`)),
       h('div.section', h('h2', 'Your data stays on this device'), h('p', 'Progress, explanations and settings are saved in this browser\'s local storage. Nothing is sent to a server, there is no account and nothing syncs between devices. Clearing browser data, private browsing or a different browser starts fresh, so export a copy now and then.'),
         BB.store.available ? null : h('div.callout.bad', 'This browser is blocking storage, so progress will be lost when you close the page. Export before leaving.'),
@@ -290,7 +289,7 @@
           h('button.btn.btn-danger', { type: 'button', onclick: () => { if (confirm('Delete all BioBridge progress on this device? Export first if you want a copy.')) { BB.store.reset(); BB.ui.toast('Progress reset'); BB.go('/', false); BB.ui.applyNav(); } } }, 'Reset all progress')), msg,
         S().legacy && S().legacy.lessons ? h('p.small.muted', { style: { marginTop: '8px' } }, `${S().legacy.lessons} lessons completed in BioBridge 1.0 were carried over.`) : null),
       h('div.section', h('h2', 'Sources'), h('ul', Object.values(BB.courses).map((c) => h('li', h('a', { href: c.url, target: '_blank', rel: 'noopener noreferrer' }, c.name), ` (${c.org})`)), h('li', h('a', { href: BB.academyUrl, target: '_blank', rel: 'noopener noreferrer' }, 'KAUST Academy Bioinformatics program page'))),
-        h('p.small.muted', 'Course structure was checked against these public pages on 7 November 2026. Teaching datasets are simulated (seeded and reproducible); gene names and the direction of the heat-shock response are real biology, the numbers are invented.')),
+        h('p.small.muted', 'Course structure and the item titles used by the Companion were checked against these public pages on 8 November 2026. Teaching datasets are simulated (seeded and reproducible); gene names and the direction of the heat-shock response are real biology, the numbers are invented.')),
       h('div.section', h('h2', 'How the interactive parts work'), h('ul',
         h('li', 'The Linux terminal is a teaching simulation written for BioBridge. It runs a defined set of commands on pretend files and matches GNU output formats; it is not a full Bash and nothing runs on your device.'),
         h('li', 'Python labs run real Python 3 in your browser (Pyodide, CPython compiled to WebAssembly). The first run downloads about 13 MB. pandas and NumPy are not loaded.'),
@@ -301,5 +300,5 @@
       h('div.section', h('h2', 'Credits'), h('p.small', 'Python in the browser: Pyodide (Mozilla Public License 2.0), with the CPython standard library (PSF license). BioBridge content and code: see the README in the project files.'), h('p.small.muted', 'Version ' + BB.config.version)));
   }
 
-  BB.pages = { home, learn, courses, labs, labPage, missionPage, tracePage, glossaryPage, notebook, plan, about, LABS };
+  BB.pages = { explore, learn, courses, labs, labPage, missionPage, tracePage, glossaryPage, notebook, plan, about, LABS };
 })();

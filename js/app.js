@@ -17,11 +17,17 @@
   }
   const page = (nav, title, crumb, fn) => guard((params, query, path) => { BB.ui.setPage(nav, typeof title === 'function' ? title(params) : title, typeof crumb === 'function' ? crumb(params) : crumb); return fn(params, query, path); });
 
-  BB.route('/', page('home', 'Home', 'Home', () => BB.pages.home()));
+  BB.route('/', page('home', 'Companion', 'Companion', () => BB.companionApp.home()));
+  BB.route('/c/:course', page('home', (p) => (BB.courses[p.course] || {}).short || 'Companion', (p) => (BB.courses[p.course] || {}).short || 'Companion', (p) => BB.companionApp.course(p)));
+  BB.route('/c/:course/:topic', page('home', (p) => ((BB.companionApp.index().byId[p.topic]) || {}).title || 'Companion topic', 'Companion topic', (p) => BB.companionApp.topic(p)));
+  BB.route('/files', page('files', 'Practice files', 'Practice files', () => BB.filesPage()));
+  BB.route('/visuals', page('visuals', 'Visual explanations', 'Visual explanations', () => BB.companionApp.visuals()));
+  BB.route('/visuals/:name', page('visuals', (p) => (BB.diagrams[p.name] || {}).title || 'Visual explanation', 'Visual explanation', (p) => BB.companionApp.visual(p)));
+  BB.route('/explore', page('explore', 'Explore deeply', 'Explore deeply', () => BB.pages.explore()));
   BB.route('/learn', page('learn', 'Learn', 'Learn', (p) => BB.pages.learn(p)));
   BB.route('/learn/:f', page('learn', 'Learn', (p) => { const f = BB.foundations.find((x) => x.id === p.f); return f ? f.short + ': ' + f.title : 'Learn'; }, (p) => BB.pages.learn(p)));
   BB.route('/lesson/:id', page('learn', (p) => (BB.lessonMeta[p.id] || {}).title || 'Lesson', (p) => (BB.lessonMeta[p.id] || {}).title || 'Lesson', (p) => BB.lessonPage(p.id)));
-  BB.route('/courses', page('courses', 'Course companion', 'Course companion', () => BB.pages.courses()));
+  BB.route('/courses', page('courses', 'Course map', 'Course map', () => BB.pages.courses()));
   BB.route('/labs', page('labs', 'Interactive labs', 'Interactive labs', () => BB.pages.labs()));
   BB.route('/labs/mission/:id', page('labs', 'Terminal mission', 'Terminal mission', (p) => BB.pages.missionPage(p)));
   BB.route('/labs/trace/:id', page('labs', 'Be the computer', 'Be the computer', (p) => BB.pages.tracePage(p)));

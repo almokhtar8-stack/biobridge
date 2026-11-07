@@ -49,18 +49,22 @@
   };
   const icon = (name) => { const s = document.createElement('span'); s.innerHTML = ICONS[name] || ''; s.style.display = 'contents'; return s; };
 
+  // group: drawer section. top: label in the desktop bar. tab: shown in the phone tab bar.
   const NAV = [
-    { id: 'home', label: 'Home', href: '#/', icon: 'home', tab: true, top: 'Home' },
-    { id: 'learn', label: 'Learn', href: '#/learn', icon: 'learn', tab: true, top: 'Learn' },
-    { id: 'courses', label: 'Course companion', href: '#/courses', icon: 'courses', top: 'Courses' },
-    { id: 'labs', label: 'Interactive labs', href: '#/labs', icon: 'labs', top: 'Labs' },
-    { id: 'practice', label: 'Placement practice', href: '#/practice', icon: 'practice', tab: true, short: 'Practice', top: 'Practice' },
-    { id: 'review', label: 'Review queue', href: '#/review', icon: 'review', tab: true, short: 'Review', top: 'Review' },
-    { id: 'progress', label: 'Progress', href: '#/progress', icon: 'progress', top: 'Progress' },
-    { id: 'glossary', label: 'Glossary', href: '#/glossary', icon: 'glossary' },
-    { id: 'notebook', label: 'My explanations', href: '#/notebook', icon: 'notebook' },
-    { id: 'plan', label: 'Study plan', href: '#/plan', icon: 'plan' },
-    { id: 'about', label: 'About, data and help', href: '#/about', icon: 'about' }
+    { id: 'home', label: 'Companion', href: '#/', icon: 'home', tab: true, top: 'Companion', group: 'Companion' },
+    { id: 'files', label: 'Practice files', href: '#/files', icon: 'download', tab: true, top: 'Files', short: 'Files', group: 'Companion' },
+    { id: 'visuals', label: 'Visual explanations', href: '#/visuals', icon: 'bulb', group: 'Companion' },
+    { id: 'explore', label: 'Explore deeply', href: '#/explore', icon: 'star', tab: true, top: 'Explore', short: 'Explore', group: 'Explore deeply (optional)' },
+    { id: 'learn', label: 'All lessons', href: '#/learn', icon: 'learn', top: 'Lessons', group: 'Explore deeply (optional)' },
+    { id: 'courses', label: 'Course map', href: '#/courses', icon: 'courses', group: 'Explore deeply (optional)' },
+    { id: 'labs', label: 'Interactive labs', href: '#/labs', icon: 'labs', top: 'Labs', group: 'Explore deeply (optional)' },
+    { id: 'practice', label: 'Placement practice', href: '#/practice', icon: 'practice', tab: true, short: 'Practice', top: 'Practice', group: 'Practice' },
+    { id: 'review', label: 'Review queue', href: '#/review', icon: 'review', top: 'Review', group: 'Practice' },
+    { id: 'progress', label: 'Progress', href: '#/progress', icon: 'progress', group: 'Practice' },
+    { id: 'glossary', label: 'Glossary', href: '#/glossary', icon: 'glossary', group: 'Tools' },
+    { id: 'notebook', label: 'My explanations', href: '#/notebook', icon: 'notebook', group: 'Tools' },
+    { id: 'plan', label: 'Study plan', href: '#/plan', icon: 'plan', group: 'Tools' },
+    { id: 'about', label: 'About, data and help', href: '#/about', icon: 'about', group: 'Tools' }
   ];
 
   let current = 'home';
@@ -68,13 +72,8 @@
 
   function navLinks(withCounts) {
     const due = BB.practice ? BB.practice.dueCount() : 0;
-    return h('nav.nav-list', { 'aria-label': 'Main' },
-      h('div.nav-label', 'Learn'),
-      NAV.slice(0, 4).map((n) => link(n)),
-      h('div.nav-label', 'Practice'),
-      NAV.slice(4, 7).map((n) => link(n)),
-      h('div.nav-label', 'Tools'),
-      NAV.slice(7).map((n) => link(n)));
+    const groups = [...new Set(NAV.map((n) => n.group))];
+    return h('nav.nav-list', { 'aria-label': 'Main' }, groups.map((g) => [h('div.nav-label', g), NAV.filter((n) => n.group === g).map((n) => link(n))]));
     function link(n) {
       const a = h('a.nav-link', { href: n.href, 'data-nav': n.id }, icon(n.icon), h('span', n.label));
       if (n.id === 'review' && due && withCounts) a.append(h('span.count', { 'aria-label': due + ' items due' }, String(due)));
@@ -265,7 +264,8 @@
     if (run && lang === 'python' && BB.pyrun) btns.append(h('button.btn', { type: 'button', onclick: () => BB.pyrun.open(code) }, icon('play'), 'Run real Python'));
     btns.append(h('button.btn', { type: 'button', 'aria-label': 'Copy code', onclick: () => copyText(code) }, icon('copy'), 'Copy'));
     head.append(btns);
-    const block = h('div.code-block', head, h('pre', h('code', code)));
+    // Focusable so keyboard users can scroll long lines sideways.
+    const block = h('div.code-block', head, h('pre', { tabindex: '0', 'aria-label': (label || LANG[lang] || 'Code') + ' code' }, h('code', code)));
     if (output == null) return block;
     return h('div', block, h('div.output-block', output));
   }

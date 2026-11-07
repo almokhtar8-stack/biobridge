@@ -15,6 +15,7 @@
     labs: {},             // labId -> { done: ts }
     missions: {},         // missionId -> { done: ts }
     traces: {},           // programId -> { done: ts }
+    companion: { seen: {}, last: null },  // Companion topics viewed (a reminder only, never scored): id -> ts; last opened id
     settings: { theme: 'system', courseStatus: {}, dailyMinutes: 45 },
     legacy: null
   });
@@ -30,6 +31,10 @@
     for (const [k, r] of Object.entries(out.review)) if (!isObj(r) || typeof r.due !== 'number') delete out.review[k];
     out.settings = Object.assign(blank().settings, isObj(src.settings) ? src.settings : {});
     if (!isObj(out.settings.courseStatus)) out.settings.courseStatus = {};
+    if (!isObj(out.companion)) out.companion = { seen: {}, last: null };
+    if (!isObj(out.companion.seen)) out.companion.seen = {};
+    for (const [id, t] of Object.entries(out.companion.seen)) if (typeof t !== 'number') delete out.companion.seen[id];
+    if (typeof out.companion.last !== 'string') out.companion.last = null;
     if (out.diagnostic != null && !(isObj(out.diagnostic) && isObj(out.diagnostic.byObj))) out.diagnostic = null;
     const okQ = (q) => isObj(q) && Array.isArray(q.options) && q.options.length > 0 && typeof q.answer === 'number';
     const a = out.activeSession;
