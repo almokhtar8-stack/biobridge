@@ -56,7 +56,11 @@ async def routes_test(browser, kind):
     labs = await page.evaluate("BB.pages.LABS.map(l => l[1])")
     missions = await page.evaluate("Object.keys(BB.missions)")
     traces = await page.evaluate("Object.keys(BB.pyPrograms)")
-    routes = ["/", "/learn", "/learn/f0", "/learn/f1", "/learn/f2", "/learn/f3", "/courses", "/labs", "/practice", "/review", "/progress", "/glossary", "/notebook", "/plan", "/about"]
+    routes = ["/", "/explore", "/files", "/visuals", "/c/ibm", "/c/rice", "/c/kaust", "/learn", "/learn/f0", "/learn/f1", "/learn/f2", "/learn/f3", "/courses", "/labs", "/practice", "/review", "/progress", "/glossary", "/notebook", "/plan", "/about"]
+    topics = await page.evaluate("BB.companionApp.index().topics.map(t => '/c/' + t.course + '/' + t.id)")
+    visuals = await page.evaluate("BB.diagram.names().map(n => '/visuals/' + n)")
+    routes += topics if (kind != "tablet" or not args.quick) else topics[::5]
+    routes += visuals if (kind != "tablet" or not args.quick) else visuals[::5]
     routes += [f"/lesson/{l}" for l in (lessons if not args.quick or kind == "desktop" else lessons[::6])]
     routes += [f"/labs/{l}" for l in labs]
     if kind == "desktop":
@@ -78,7 +82,7 @@ async def routes_test(browser, kind):
     ok(f"[{kind}] no horizontal page overflow", not overflow, ", ".join(overflow[:12]))
     if args.shots:
         os.makedirs(args.shots, exist_ok=True)
-        for r, name in [("/", "home"), ("/lesson/f0-dogma", "lesson-dogma"), ("/lesson/f1-grep", "lesson-grep"), ("/practice", "practice"), ("/labs/rnaseq", "lab-rnaseq"), ("/lesson/f2-variables", "lesson-variables"), ("/labs/singlecell-clusters", "lab-clusters"), ("/progress", "progress"), ("/courses", "courses")]:
+        for r, name in [("/", "home"), ("/c/ibm", "course-ibm"), ("/c/ibm/ibm-paths", "topic-paths"), ("/c/kaust/kaust-normalize", "topic-normalize"), ("/files", "files"), ("/visuals", "visuals"), ("/explore", "explore"), ("/lesson/f0-dogma", "lesson-dogma"), ("/lesson/f1-grep", "lesson-grep"), ("/practice", "practice"), ("/labs/rnaseq", "lab-rnaseq"), ("/lesson/f2-variables", "lesson-variables"), ("/labs/singlecell-clusters", "lab-clusters"), ("/progress", "progress"), ("/courses", "courses")]:
             await go(page, r)
             await page.screenshot(path=f"{args.shots}/{kind}-{name}.png", full_page=False)
     await ctx.close()
@@ -306,6 +310,135 @@ async def phone_flows(browser):
     ok("[phone] flows ran without JavaScript errors", not errors, "; ".join(errors[:5]))
     await ctx.close()
 
+async def companion_flows(browser):
+    """BioBridge 2.2: the Companion, its visuals, search, try-its and the practice files, at phone size."""
+    errors = []
+    ctx, page = await new_page(browser, "phone", errors)
+    await go(page, "/")
+    q = await page.inner_text("#main h1")
+    cards = await page.locator(".course-card").count()
+    ok("[companion] home asks which course and topic, with the three courses", "Which course and topic" in q and cards == 3, f"{q!r} cards={cards}")
+    top = await page.evaluate("document.querySelectorAll('.course-card')[2].getBoundingClientRect().top")
+    ok("[companion] all three course choices start within the first two screens", top < 2 * 844, f"top={top}")
+    # search
+    async def search(term):
+        await page.fill("#home-search", term)
+        await page.wait_for_timeout(350)
+        return await page.evaluate("[...document.querySelectorAll('.search-results .topic-row')].map(a => a.getAttribute('href'))")
+    hits = await search("grep")
+    ok("[companion] search 'grep' finds the grep topic", any(h.endswith("/ibm-grep") for h in hits), str(hits[:4]))
+    hits = await search("t-test")
+    ok("[companion] search 't-test' finds the t-test topic", any(h.endswith("/kaust-ttest") for h in hits), str(hits[:4]))
+    hits = await search("cd")
+    ok("[companion] short search 'cd' matches whole words only", hits and all("/ibm-" in h for h in hits[:3]), str(hits[:5]))
+    hits = await search("zzzqqq")
+    ok("[companion] a search with no match explains what to try", not hits and "No Companion topic matches" in await page.inner_text(".search-results"))
+    # open a topic from the course page
+    await go(page, "/c/ibm")
+    mods = await page.locator(".module-block").count()
+    ok("[companion] course page lists its 4 modules", mods == 4, str(mods))
+    attempts0 = await page.evaluate("[BB.store.state.attempts.length, Object.keys(BB.store.state.review).length, BB.store.state.sessions.length]")
+    await page.locator(".topic-row[href$='/ibm-paths']").tap()
+    await page.wait_for_selector(".companion-topic")
+    ok("[companion] topic page shows the lecture it helps with and the time", "Helps with" in await page.inner_text(".lesson-top") and "min" in await page.inner_text(".lesson-top .chips"))
+    # diagram stepper
+    cap1 = await page.inner_text(".dg .dg-cap")
+    await page.tap(".dg .dg-ctrl .btn-primary")
+    cap2 = await page.inner_text(".dg .dg-cap")
+    cnt = await page.inner_text(".dg .dg-count")
+    await page.tap(".dg .dg-ctrl button:has-text('Back')")
+    cap3 = await page.inner_text(".dg .dg-cap")
+    ok("[companion] visual steps forward and back with captions", cap1 != cap2 and cap3 == cap1 and "step 2" in cnt.lower(), cnt)
+    nsteps = await page.evaluate("document.querySelectorAll('.dg .dg-dots button').length")
+    ntext = await page.evaluate("document.querySelectorAll('.dg .dg-textv li').length")
+    ok("[companion] every visual step has a text version", nsteps == ntext and nsteps >= 3, f"{nsteps} vs {ntext}")
+    # quick check is not scored
+    ans = await page.evaluate("BB.companionApp.index().byId['ibm-paths'].check.answer")
+    await page.locator("#ct-check .option[data-i='%d']" % 0).tap()
+    await page.wait_for_selector("#ct-check .feedback")
+    attempts1 = await page.evaluate("[BB.store.state.attempts.length, Object.keys(BB.store.state.review).length, BB.store.state.sessions.length]")
+    ok("[companion] quick check gives feedback but records no score, review item or session", attempts1 == attempts0, f"{attempts0} -> {attempts1} (answer {ans})")
+    seen = await page.evaluate("[!!BB.store.state.companion.seen['ibm-paths'], BB.store.state.companion.last]")
+    ok("[companion] opening a topic is remembered as viewed", seen[0] and seen[1] == "ibm-paths", str(seen))
+    # terminal try-it
+    await go(page, "/c/ibm/ibm-terminal")
+    await page.tap("#ct-try button:has-text('Start the activity')")
+    await page.wait_for_selector("#ct-try .terminal")
+    first = await page.evaluate("BB.companionApp.index().byId['ibm-terminal'].try.tries[0]")
+    await page.locator("#ct-try .term-try").first.tap()
+    ok("[companion] tapping a suggested command puts it in the terminal", (await page.input_value("#ct-try .term-input input")) == first, first)
+    await page.tap("#ct-try .term-input button[type=submit]")
+    await page.wait_for_timeout(200)
+    out = await page.inner_text("#ct-try .term-screen")
+    ok("[companion] the suggested command runs in the browser terminal", first in out and "command not found" not in out, out[-120:])
+    # computer try shows verified expected output
+    comp = await page.evaluate("BB.companionApp.index().topics.filter(t => t.try && t.try.kind === 'computer').map(t => '/c/' + t.course + '/' + t.id)[0]")
+    await go(page, comp)
+    await page.tap("#ct-try button:has-text('Show the exercise')")
+    await page.wait_for_selector("#ct-try [data-widget='computer'] details")
+    ok("[companion] computer exercise links to the practice files and has an expected output", await page.locator("#ct-try a[href='#/files']").count() == 1 and await page.locator("#ct-try details pre").count() == 1, comp)
+    # home remembers the last topic
+    await go(page, "/")
+    ok("[companion] home offers to pick up where you left off", "pick up where you left off" in (await page.inner_text("#main")).lower())
+    # practice files
+    await go(page, "/files")
+    href = await page.get_attribute("a[download='biobridge-practice.zip']", "href")
+    zipinfo = await page.evaluate("fetch(%s).then(r => r.arrayBuffer()).then(b => { const u = new Uint8Array(b); return [b.byteLength, String.fromCharCode(u[0], u[1])]; })" % json.dumps(href))
+    ok("[files] the ZIP download link works and is a ZIP file", zipinfo[0] > 1000 and zipinfo[1] == "PK", str(zipinfo))
+    n_cards = await page.locator(".file-card").count()
+    ok("[files] every file has a card (8 files and the results folder)", n_cards == 9, str(n_cards))
+    await page.locator(".file-card").nth(1).locator("summary").first.tap()
+    ok("[files] a file can be previewed before downloading", await page.locator(".file-card").nth(1).locator("table.data").first.is_visible())
+    async with page.expect_download() as dl:
+        await page.locator(".file-card").nth(1).locator("button:has-text('Download this file')").tap()
+    d = await dl.value
+    body = open(await d.path()).read()
+    want = await page.evaluate("BB.vfs.files['/home/student/project/data/counts.tsv'].c")
+    ok("[files] a single file downloads with exactly the simulator's content", d.suggested_filename == "counts.tsv" and body == want, d.suggested_filename)
+    txt = await page.inner_text("#main")
+    ok("[files] the page says the browser terminal cannot read downloaded files", "cannot open files on your computer" in txt)
+    await page.tap("button:has-text('Open the browser terminal here')")
+    await page.wait_for_selector(".route-card .terminal")
+    await page.fill(".route-card .term-input input", "ls")
+    await page.tap(".route-card .term-input button[type=submit]")
+    await page.wait_for_timeout(200)
+    ok("[files] the browser route opens a terminal in ~/project with the same files", "README.txt" in await page.inner_text(".route-card .term-screen"))
+    ok("[files] tested commands are listed with outputs", await page.locator(".cmd-item").count() >= 15)
+    # explore deeply keeps the 2.1 dashboard
+    await go(page, "/explore")
+    ex = await page.inner_text("#main")
+    ok("[explore] the full path, labs and practice are still one tap away", "Four foundations" in ex and "Your next useful actions" in ex)
+    ok("[companion] flows ran without JavaScript errors", not errors, "; ".join(errors[:6]))
+    await ctx.close()
+
+async def diagram_checks(browser):
+    """Every visual: renders, has a caption per step, and returns exactly to its first state after stepping to the end and back."""
+    errors = []
+    ctx, page = await new_page(browser, "desktop", errors)
+    await go(page, "/visuals")
+    names = await page.evaluate("BB.diagram.names()")
+    state = "(() => { const st = document.querySelector('.dg .dg-stage'); return [st.textContent, [...st.querySelectorAll('.dg-off')].length, [...st.querySelectorAll('.dg-hi')].length, [...st.querySelectorAll('[transform]')].map(e => e.getAttribute('transform')).join('|')]; })()"
+    bad, empty = [], []
+    for n in names:
+        await go(page, "/visuals/" + n)
+        first = await page.evaluate(state)
+        dots = page.locator(".dg .dg-dots button")
+        k = await dots.count()
+        caps = set()
+        for i in range(k):
+            await dots.nth(i).click()
+            caps.add(await page.inner_text(".dg .dg-cap"))
+        await dots.nth(0).click()
+        again = await page.evaluate(state)
+        if again != first:
+            bad.append(n)
+        if len(caps) != k:
+            empty.append(n)
+    ok(f"[visuals] all {len(names)} visuals return to their first state after stepping to the end and back", not bad, ", ".join(bad))
+    ok("[visuals] every step has its own caption", not empty, ", ".join(empty))
+    ok("[visuals] no JavaScript errors while stepping through every visual", not errors, "; ".join(errors[:5]))
+    await ctx.close()
+
 async def axe_audit(browser):
     if not args.axe:
         return
@@ -313,10 +446,12 @@ async def axe_audit(browser):
     errors = []
     ctx, page = await new_page(browser, "desktop", errors)
     totals = {}
-    for r in ["/", "/learn", "/lesson/f0-dogma", "/lesson/f1-grep", "/lesson/f2-variables", "/lesson/f3-de", "/practice", "/labs/rnaseq", "/labs/terminal", "/progress", "/glossary", "/plan", "/about", "/courses"]:
+    for r in ["/", "/c/ibm", "/c/ibm/ibm-paths", "/c/rice/rice-variables", "/c/kaust/kaust-normalize", "/files", "/visuals", "/visuals/fs-tree", "/explore", "/learn", "/lesson/f0-dogma", "/lesson/f1-grep", "/lesson/f2-variables", "/lesson/f3-de", "/practice", "/labs/rnaseq", "/labs/terminal", "/progress", "/glossary", "/plan", "/about", "/courses"]:
         for theme in ["light", "dark"]:
             await go(page, r)
             await page.evaluate(f"document.documentElement.setAttribute('data-theme', '{theme}')")
+            # audit hidden content too: open every collapsible section
+            await page.evaluate("document.querySelectorAll('details').forEach(d => d.open = true)")
             await page.add_script_tag(content=src)
             res = await page.evaluate("axe.run(document, { runOnly: ['wcag2a', 'wcag2aa'] }).then(r => r.violations.map(v => ({id: v.id, impact: v.impact, n: v.nodes.length, ex: v.nodes.slice(0,2).map(n => n.target.join(' '))})))")
             for v in res:
@@ -335,6 +470,8 @@ async def main():
             await routes_test(browser, kind)
         await flows(browser)
         await phone_flows(browser)
+        await companion_flows(browser)
+        await diagram_checks(browser)
         await axe_audit(browser)
         await browser.close()
     print(f"\n{sum(1 for r in results if r[1])}/{len(results)} checks passed")

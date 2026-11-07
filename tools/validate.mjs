@@ -182,6 +182,44 @@ if (BB.pyTraces) for (const id of Object.keys(BB.pyPrograms || {})) if (!BB.pyTr
 // ---------- method scenarios, generators metadata, misc
 for (const [i, s] of (BB.scenarios || []).entries()) { checkMcq(`scenario #${i}`, s); lintDeep(`scenario #${i}`, s); }
 
+// ---------- Companion topics (BioBridge 2.2); tools/check_companion.mjs runs the full per-topic checks
+const ITEMS = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools/course_items.json'), 'utf8'));
+const dgNames = new Set();
+for (const f of fs.readdirSync(path.join(ROOT, 'js/diagrams')).filter((x) => x.endsWith('.js'))) {
+  for (const m of fs.readFileSync(path.join(ROOT, 'js/diagrams', f), 'utf8').matchAll(/\bdef\(\s*'([a-z0-9-]+)'/g)) dgNames.add(m[1]);
+}
+const CWIDGETS = new Set(['dogma', 'expression', 'journey', 'filetree', 'datatable', 'scale', 'cron', 'fastq', 'countmatrix', 'normalization', 'rnaseq', 'log2', 'variability', 'correlation', 'pvalues', 'singlecell', 'methods']);
+const seenTopics = new Set();
+const usedDiagrams = new Set();
+for (const [i, t] of (BB.companion || []).entries()) {
+  const w = `companion ${t && t.id ? t.id : '#' + i}`;
+  if (!t || !isStr(t.id)) { err(`${w}: missing id`); continue; }
+  if (seenTopics.has(t.id)) err(`${w}: duplicate id`);
+  seenTopics.add(t.id);
+  if (!BB.courses[t.course] || !BB.courses[t.course].modules.some((m) => m.id === t.module)) err(`${w}: unknown course or module`);
+  for (const l of t.lectures || []) if (!(ITEMS.items[t.module] || []).includes(l)) err(`${w}: "${l}" is not a public item title of ${t.module}`);
+  if (![2, 3, 4].includes(t.minutes)) err(`${w}: minutes must be 2, 3 or 4`);
+  if (!isStr(t.title) || !isStr(t.explain, 40) || !isStr(t.why, 20)) err(`${w}: title, explain and why are required`);
+  const v = t.visual || {};
+  if (v.diagram) { usedDiagrams.add(v.diagram); if (!dgNames.has(v.diagram)) err(`${w}: diagram ${v.diagram} is not defined in js/diagrams`); }
+  else if (!CWIDGETS.has(v.widget)) err(`${w}: visual needs a defined diagram or widget`);
+  for (const d of t.deeper || []) if (!lessonMeta[d]) err(`${w}: unknown lesson ${d}`);
+  if (t.check) checkMcq(`${w}.check`, t.check);
+  else err(`${w}: check question missing`);
+  const ex = t.example;
+  if (ex && ['bash', 'python', 'r'].includes(ex.lang) && !ex.noVerify && typeof ex.output === 'string')
+    jobs.push({ where: `${w}.example`, lang: ex.lang, src: ex.code, expect: ex.output, mode: 'stdout', cwd: ex.cwd || null, others: [] });
+  if (t.try && t.try.kind === 'computer') jobs.push({ where: `${w}.try(computer)`, lang: t.try.lang, src: t.try.code, expect: t.try.output, mode: 'stdout', cwd: '~/project', others: [] });
+  if (t.try && t.try.kind === 'mission' && !BB.missions[t.try.mission]) err(`${w}: unknown mission ${t.try.mission}`);
+  if (t.try && t.try.kind === 'trace' && !BB.pyPrograms[t.try.program]) err(`${w}: unknown trace program ${t.try.program}`);
+  if (t.try && t.try.kind === 'widget' && !CWIDGETS.has(t.try.widget)) err(`${w}: unknown widget ${t.try.widget}`);
+  lintDeep(w, t);
+}
+for (const c of Object.keys(BB.courses || {})) if (!(BB.companion || []).some((t) => t.course === c)) warn(`companion: no topics for course ${c}`);
+for (const d of dgNames) if (!usedDiagrams.has(d)) warn(`diagram ${d}: not used by any Companion topic (still listed in the visual library)`);
+if (BB.practiceFiles) lintDeep('practiceFiles', BB.practiceFiles);
+else err('practiceFiles: content/practice-files.js missing');
+
 // ---------- coverage summary
 const objWithLessons = new Set(Object.values(lessonMeta).flatMap((m) => m.obj));
 for (const o of Object.keys(objectives)) {
@@ -194,6 +232,7 @@ fs.writeFileSync(path.join(ROOT, 'tools/out/verify_jobs.json'), JSON.stringify(j
 fs.writeFileSync(path.join(ROOT, 'tools/out/content.json'), JSON.stringify({ vfs: BB.vfs, pyPrograms: BB.pyPrograms, lessonMeta, objectives }, null, 1));
 
 if (!quiet) {
+  console.log(`companion topics: ${(BB.companion || []).length}  diagrams: ${dgNames.size}`);
   console.log(`lessons: ${(BB.lessons || []).length}/${Object.keys(lessonMeta).length}  questions: ${(BB.questions || []).length}  glossary: ${(BB.glossary || []).length}  missions: ${Object.keys(BB.missions || {}).length}  programs: ${Object.keys(BB.pyPrograms || {}).length}  code jobs: ${jobs.length}`);
   const byF = {};
   for (const q of BB.questions || []) { const f = (objectives[q.obj?.[0]] || {}).f; byF[f] = (byF[f] || 0) + 1; }

@@ -160,6 +160,35 @@ P();
 for (const [id, m] of Object.entries(meta)) if (!m.courses.length) P(`- ${lessonLink(id)} (${alignLabel[m.align]})`);
 P();
 
+// Companion (2.2): every public course item and the topic that helps with it
+P('## Companion topics by course item (BioBridge 2.2)');
+P();
+P('Item titles are from the public Coursera pages (checked 8 November 2026, `tools/course_items.json`). "Background" marks a topic that gives background for an item rather than its exact subject. Items without a topic are introductions, cheat sheets, summaries, quizzes or project submissions.');
+P();
+const ITEMS = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools/course_items.json'), 'utf8'));
+const topics = BB.companion || [];
+let covered = 0, total = 0;
+for (const [ck, c] of Object.entries(BB.courses)) {
+  P(`### ${c.name} (${c.org})`);
+  P();
+  for (const m of c.modules) {
+    P(`**Module ${m.n}: ${m.title}**`);
+    P();
+    P('| Course item | Companion topic |');
+    P('| --- | --- |');
+    for (const item of ITEMS.items[m.id] || []) {
+      const ts = topics.filter((t) => (t.lectures || []).includes(item));
+      total++; if (ts.length) covered++;
+      P(`| ${item.replace(/\|/g, '/')} | ${ts.map((t) => `[${t.title}](../index.html#/c/${t.course}/${t.id})${t.background ? ' (background)' : ''}`).join('; ') || '' } |`);
+    }
+    const extra = topics.filter((t) => t.module === m.id && !(t.lectures || []).length);
+    for (const t of extra) P(`| (module description) | [${t.title}](../index.html#/c/${t.course}/${t.id}) |`);
+    P();
+  }
+}
+P(`${covered} of ${total} public course items have at least one Companion topic; ${topics.length} topics in total.`);
+P();
+
 // Automatic gap report
 P('## Gaps and thin spots');
 P();

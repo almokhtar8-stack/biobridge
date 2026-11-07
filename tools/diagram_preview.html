@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BioBridge diagram preview (development)</title>
+<link rel="stylesheet" href="../css/styles.css">
+<style>body { padding: 16px; } .pv { max-width: 1100px; margin: 0 auto 28px; } .pv h2 { font-size: .9rem; color: var(--muted); margin: 0 0 6px; font-family: var(--mono); }</style>
+</head>
+<body>
+<!-- Development preview of every diagram. Query: ?theme=dark&only=name1,name2&step=N -->
+<div id="out"></div>
+<script>window.BB = window.BB || {}; BB.store = { state: { settings: { theme: 'light' } } };</script>
+<script src="../content/curriculum.js"></script>
+<script src="../content/datasets.js"></script>
+<script src="../content/vfs.js"></script>
+<script src="../js/core.js"></script>
+<script src="../js/text.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/widgets/diagrams.js"></script>
+<script src="../js/diagrams/core.js"></script>
+<script src="../js/diagrams/linux.js"></script>
+<script src="../js/diagrams/python.js"></script>
+<script src="../js/diagrams/kaust.js"></script>
+<script>
+(function () {
+  const q = new URLSearchParams(location.search);
+  document.documentElement.setAttribute('data-theme', q.get('theme') === 'dark' ? 'dark' : 'light');
+  const only = q.get('only') ? q.get('only').split(',') : BB.diagram.names();
+  const step = q.get('step') != null ? +q.get('step') : null;
+  const out = document.getElementById('out');
+  for (const name of only) {
+    const box = document.createElement('section'); box.className = 'pv'; box.id = 'pv-' + name;
+    const t = document.createElement('h2'); t.textContent = name; box.append(t);
+    let n = 0; try { n = BB.diagrams[name].steps.length; } catch (e) {}
+    box.append(BB.diagram.render(name, { step: step == null ? 0 : Math.min(step, Math.max(0, n - 1)) }));
+    out.append(box);
+  }
+  window.__ready = true;
+})();
+</script>
+</body>
+</html>
